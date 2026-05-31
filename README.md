@@ -7,23 +7,27 @@
 [Conventional Commits](https://www.conventionalcommits.org/) 규칙을 따릅니다.
 
 ```
-<type>(<scope>): <description>
+<type>: <subject>
 ```
+
+- **type**: 영어로 작성
+- **subject**: 한글로 작성 (50자 이내)
 
 | Type | 설명 |
 |------|------|
 | `feat` | 새로운 기능 추가 |
 | `fix` | 버그 수정 |
 | `docs` | 문서 변경 |
-| `style` | 코드 포맷팅, 세미콜론 누락 등 (로직 변경 없음) |
+| `style` | 코드 포맷, 공백 정리 (기능 변화 없음) |
 | `refactor` | 리팩토링 (기능 추가 및 버그 수정 없음) |
 | `test` | 테스트 추가 또는 수정 |
 | `chore` | 빌드 설정, 패키지 관리 등 기타 변경 |
+| `perf` | 성능 개선 |
 
 **예시**
 ```
-feat(player): 이동 속도 조절 기능 추가
-fix(ui): 체력바 표시 오류 수정
+feat: 이동 속도 조절 기능 추가
+fix: 체력바 표시 오류 수정
 docs: README 컨벤션 항목 추가
 ```
 
