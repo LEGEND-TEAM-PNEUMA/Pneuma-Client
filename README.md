@@ -1,5 +1,84 @@
 # Pneuma-Client
 
+## 프로젝트 구조
+```text
+CardBattleGame
+├── Assets
+│
+├── Scripts
+│   │
+│   ├── Core
+│   │
+│   ├── Battle
+│   │
+│   ├── Card
+│   │
+│   ├── Unit
+│   │
+│   ├── UI
+│   │
+│   ├── Effects
+│   │
+│   └── Audio
+│
+├── ScriptableObjects
+│   ├── Cards
+│   ├── Enemies
+│   └── Buffs
+│
+├── Prefabs
+│   ├── Battle
+│   ├── Cards
+│   ├── Units
+│   └── UI
+│
+├── Scenes
+│
+└── Tests
+    ├── Battle.Tests
+    ├── Card.Tests
+    ├── Unit.Tests
+    └── Core.Tests
+```
+
+## 프로젝트 의존성
+```text
+CardBattleGame
+│
+├── Battle
+│   ├── Core
+│   ├── Card
+│   └── Unit
+│
+├── Card
+│   ├── Core
+│   └── Unit
+│
+├── Unit
+│   └── Core
+│
+├── UI
+│   ├── Core
+│   ├── Battle
+│   ├── Card
+│   └── Unit
+│
+├── Effects
+│   └── Core
+│
+├── Audio
+│   └── Core
+│
+└── Core
+```
+
+## 사전 준비사항
+- Unity 6 (6000.0.68f1 버전) 설치
+- Visual Studio 2022 또는 JetBrains Rider 설치
+- Git 설치
+- GitHub 계정 생성 및 저장소 접근 권한 확인
+
+
 ## 네이밍 컨벤션
 
 ### 커밋 컨벤션
