@@ -2,29 +2,43 @@
 
 ## 프로젝트 구조
 ```text
-CardBattleGame
-├── Assets
+CardBattleGame/Assets
 │
 ├── Scripts
-│   │
 │   ├── Core
+│   │   ├── GameManager
+│   │   ├── EventBus
+│   │   └── Utility
 │   │
 │   ├── Battle
+│   │   ├── Managers
+│   │   ├── States
+│   │   ├── Systems
+│   │   └── Data
 │   │
-│   ├── Card
+│   ├── Cards
+│   │   ├── Runtime
+│   │   ├── Data
+│   │   └── Effects
 │   │
-│   ├── Unit
+│   ├── Units
+│   │   ├── Runtime
+│   │   ├── Data
+│   │   ├── Skills
+│   │   └── Buffs
 │   │
 │   ├── UI
-│   │
-│   ├── Effects
+│   │   ├── BattleUI
+│   │   ├── CardUI
+│   │   └── Common
 │   │
 │   └── Audio
 │
-├── ScriptableObjects
+├── Data
 │   ├── Cards
 │   ├── Enemies
-│   └── Buffs
+│   ├── Buffs
+│   └── Skills
 │
 ├── Prefabs
 │   ├── Battle
@@ -35,10 +49,6 @@ CardBattleGame
 ├── Scenes
 │
 └── Tests
-    ├── Battle.Tests
-    ├── Card.Tests
-    ├── Unit.Tests
-    └── Core.Tests
 ```
 
 ## 프로젝트 의존성
