@@ -1,30 +1,38 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LobbyController : MonoBehaviour
+namespace Pneuma.UI.Lobby
 {
-    private const string BattleScene = "SampleScene";
-
-    public void OnClickPlay()
+    public class LobbyController : MonoBehaviour
     {
-        SceneManager.LoadScene(BattleScene);
-    }
+        private const string BattleScene = "SampleScene";
 
-    public void OnClickCollection()
-    {
-        // 도감 씬 이동
-        Debug.Log("도감 씬으로 이동");
-    }
+        public void OnClickPlay()
+        {
+            SceneManager.LoadScene(BattleScene);
+        }
 
-    public void OnClickSettings()
-    {
-        // 설정 창 열기
-        Debug.Log("세팅 UI 활성화");
-    }
+        public void OnClickCollection()
+        {
+            // 도감 씬 이동
+            Debug.Log("도감 씬으로 이동");
+        }
 
-    public void OnClickExit()
-    {
-        Debug.Log("앱 종료");
-        Application.Quit();
+        public void OnClickSettings()
+        {
+            // 설정 창 열기
+            Debug.Log("세팅 UI 활성화");
+        }
+
+        public void OnClickExit()
+        {
+            Debug.Log("앱 종료");
+
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
     }
 }

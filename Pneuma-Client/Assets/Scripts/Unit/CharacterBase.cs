@@ -1,57 +1,91 @@
+using System;
 using UnityEngine;
 
-public class CharacterBase : MonoBehaviour
+namespace Pneuma.Unit
 {
-    [SerializeField] private int maxHp = 100;
-
-    public int MaxHp => maxHp;
-    public int CurrentHp { get; private set; }
-    public int CurrentShield { get; private set; }
-    public bool IsDead => CurrentHp <= 0;
-
-    private void Awake()
+    public class CharacterBase : MonoBehaviour
     {
-        CurrentHp = maxHp;
-        CurrentShield = 0;
-    }
+        [Header("Status Settings")]
+        [SerializeField, Min(1)] private int maxHp = 100;
 
-    public void TakeDamage(int damage)
-    {
-        if (damage <= 0 || IsDead) return;
+        public int MaxHp => maxHp;
+        public int CurrentHp { get; private set; }
+        public int CurrentShield { get; private set; }
+        public bool IsDead => CurrentHp <= 0;
 
-        int remainingDamage = damage;
+        // 상태 변화를 알리기 위한 이벤트
+        public event Action<int, int> OnHpChanged; // (current, max)
+        public event Action<int> OnShieldChanged;
+        public event Action<CharacterBase> OnDeath;
 
-        if (CurrentShield > 0)
+        private void Awake()
         {
-            int blockedDamage = Mathf.Min(CurrentShield, remainingDamage);
-            CurrentShield -= blockedDamage;
-            remainingDamage -= blockedDamage;
+            CurrentHp = maxHp;
+            CurrentShield = 0;
         }
 
-        if (remainingDamage > 0)
+        public void TakeDamage(int damage)
         {
-            CurrentHp -= remainingDamage;
-            CurrentHp = Mathf.Max(CurrentHp, 0);
+            if (damage <= 0 || IsDead) return;
+
+            bool wasAlive = !IsDead; //OnDeath 중복 호출 방지
+            int remainingDamage = damage;
+
+            if (CurrentShield > 0)
+            {
+                int blockedDamage = Mathf.Min(CurrentShield, remainingDamage);
+                CurrentShield -= blockedDamage;
+                remainingDamage -= blockedDamage;
+                OnShieldChanged?.Invoke(CurrentShield);
+            }
+
+            if (remainingDamage > 0)
+            {
+                CurrentHp = Mathf.Max(CurrentHp - remainingDamage, 0);
+                OnHpChanged?.Invoke(CurrentHp, maxHp);
+            }
+
+            if (wasAlive && IsDead)
+            {
+                OnDeath?.Invoke(this);
+            }
         }
-    }
 
-    public void Heal(int amount)
-    {
-        if (amount <= 0 || IsDead) return;
+        public void Heal(int amount)
+        {
+            if (amount <= 0 || IsDead) return;
+            
+            int prevHp = CurrentHp;
+            CurrentHp = Mathf.Min(CurrentHp + amount, maxHp);
 
-        CurrentHp += amount;
-        CurrentHp = Mathf.Min(CurrentHp, MaxHp);
-    }
+            if (prevHp == CurrentHp) return;
+            OnHpChanged?.Invoke(CurrentHp, maxHp);
+        }
 
-    public void AddShield(int amount)
-    {
-        if (amount <= 0 || IsDead) return;
+        public void IncreaseMaxHp(int amount)
+        {
+            if (amount <= 0) return;
 
-        CurrentShield += amount;
-    }
+            maxHp += amount;
+            CurrentHp += amount;
 
-    public void ClearShield()
-    {
-        CurrentShield = 0;
+            OnHpChanged?.Invoke(CurrentHp, maxHp);
+        }
+
+        public void AddShield(int amount)
+        {
+            if (amount <= 0 || IsDead) return;
+
+            CurrentShield += amount;
+            OnShieldChanged?.Invoke(CurrentShield);
+        }
+
+        public void ClearShield()
+        {
+            if (CurrentShield == 0) return;
+            
+            CurrentShield = 0;
+            OnShieldChanged?.Invoke(CurrentShield);
+        }
     }
 }
