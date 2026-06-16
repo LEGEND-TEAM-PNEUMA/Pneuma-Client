@@ -47,6 +47,7 @@ namespace Pneuma.Unit
 
             if (wasAlive && IsDead)
             {
+                // 사망 판단
                 OnDeath?.Invoke(this);
             }
         }
