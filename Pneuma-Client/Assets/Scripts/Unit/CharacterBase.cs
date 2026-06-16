@@ -6,7 +6,7 @@ namespace Pneuma.Unit
     public class CharacterBase : MonoBehaviour
     {
         [Header("Status Settings")]
-        [SerializeField, Min(1)] private int maxHp = 100;
+        [SerializeField] private int maxHp = 100;
 
         public int MaxHp => maxHp;
         public int CurrentHp { get; private set; }
@@ -50,6 +50,9 @@ namespace Pneuma.Unit
                 // 사망 판단
                 OnDeath?.Invoke(this);
             }
+
+            Debug.Log("TakeDamage:" + damage);
+            Debug.Log("CurrentHp:" + CurrentHp);
         }
 
         public void Heal(int amount)
@@ -61,6 +64,9 @@ namespace Pneuma.Unit
 
             if (prevHp == CurrentHp) return;
             OnHpChanged?.Invoke(CurrentHp, maxHp);
+
+            Debug.Log("Heal:" + amount);
+            Debug.Log("CurrentHp:" + CurrentHp);
         }
 
         public void IncreaseMaxHp(int amount)
@@ -79,6 +85,9 @@ namespace Pneuma.Unit
 
             CurrentShield += amount;
             OnShieldChanged?.Invoke(CurrentShield);
+
+            Debug.Log("AddShield:" + amount);
+            Debug.Log("CurrentShield:" + CurrentShield);
         }
 
         public void ClearShield()
