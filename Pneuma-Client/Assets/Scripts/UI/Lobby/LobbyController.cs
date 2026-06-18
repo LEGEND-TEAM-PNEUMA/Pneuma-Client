@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LobbyController : MonoBehaviour
+namespace Pneuma.UI.Lobby
 {
     private const string BattleScene = "SampleScene";
     [SerializeField] private GameObject MainPanel;
@@ -9,14 +9,12 @@ public class LobbyController : MonoBehaviour
 
     public void OnClickPlay()
     {
-        SceneManager.LoadScene(BattleScene);
-    }
+        private const string BattleScene = "SampleScene";
 
-    public void OnClickCollection()
-    {
-        // 도감 씬 이동
-        Debug.Log("도감 씬으로 이동");
-    }
+        public void OnClickPlay()
+        {
+            SceneManager.LoadScene(BattleScene);
+        }
 
     public void OnClickSettings()
     {

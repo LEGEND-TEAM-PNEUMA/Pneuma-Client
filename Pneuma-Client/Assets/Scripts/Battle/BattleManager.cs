@@ -56,22 +56,15 @@ public class BattleManager : MonoBehaviour
         CurrentTurn++;
     }
 
-    public void CheckBattleResult()
+    public void OnPlayerDead()
     {
-        // 매개변수를 통해 승패를 판단하려고 했지만
-        // 호출할 때마다 계속 전달해야하므로 
-        // BattleManager에서 Player와 Enemy의 체력을 직접 참조하여 승패를 판단하도록 변경
+        ChangeState(BattleState.Defeat);
+    }
 
-        // TODO: Player, Enemy 구현 후 참조 연결
-        // if(CurrentPlayer.CurrentHp <= 0)
-        // {
-        //     ChangeState(BattleState.Defeat);
-        //     return;
-        // }
-        // if(Enemies.All(enemy => enemy.IsDead))
-        // {
-        //     ChangeState(BattleState.Victory);
-        // }
+    public void OnEnemyDead()
+    {
+        // 모든 적 or 특정 적 사망 시 Victory
+        ChangeState(BattleState.Victory);
     }
 
     private void OnDestroy()
