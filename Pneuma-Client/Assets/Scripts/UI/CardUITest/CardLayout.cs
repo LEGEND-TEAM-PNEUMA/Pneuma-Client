@@ -1,9 +1,9 @@
 ﻿using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using UnityEngine;
 
+# region Legacy Code
 [System.Serializable]
 public class CardObject
 {
@@ -222,3 +222,4 @@ public class CardLayout : MonoBehaviour
 
     #endregion
 }
+#endregion
