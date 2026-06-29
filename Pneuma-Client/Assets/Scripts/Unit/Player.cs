@@ -9,33 +9,47 @@ namespace Pneuma.Unit
     /// </summary>
     public class Player : CharacterBase
     {
-        [Header("Player Info")]
-        [SerializeField] private string characterName;
+        [Header("Player Data")]
+        [SerializeField] private PlayerData playerData;
 
-        [Header("Battle Resource")]
-        [SerializeField] private int maxEnergy = 3;
+        private int runtimeMaxEnergy;
 
-        public string CharacterName => characterName;
+        public int MaxEnergy => runtimeMaxEnergy;
 
-        public int MaxEnergy => maxEnergy;
+        // 프로퍼티
+        public string CharacterId => playerData != null ? playerData.CharacterId : string.Empty;
+        public PlayerData PlayerData => playerData;
+
+        public string CharacterName => playerData != null ? playerData.CharacterName : string.Empty;
         public int CurrentEnergy { get; private set; }
 
         public event Action<int, int> OnEnergyChanged; // (current, max)
 
         protected override void Awake()
         {
-            base.Awake();
+            if (playerData == null)
+            {
+                Debug.LogError("[Player] PlayerData가 연결되지 않았습니다.");
+                base.Awake();
+                runtimeMaxEnergy = 3;
+            }
+            else
+            {
+                InitializeStatus(playerData.MaxHp);
+                runtimeMaxEnergy = playerData.MaxEnergy;
+            }
 
-            CurrentEnergy = maxEnergy;
+            CurrentEnergy = runtimeMaxEnergy;
+            OnEnergyChanged?.Invoke(CurrentEnergy, runtimeMaxEnergy);
         }
 
-        public void OnPlayerTurnStarted()
+        public void OnPlayerTurnStarted() // 플레이어 턴 시작 시 에너지, 쉴드 수치 초기화
         {
             RefillEnergy();
             ClearShield();
         }
 
-        public bool CanUseEnergy(int cost)
+        public bool CanUseEnergy(int cost) // 에너지 사용가능 여부 확인
         {
             if (IsDead) return false;
             if (cost < 0) return false;
@@ -43,29 +57,29 @@ namespace Pneuma.Unit
             return CurrentEnergy >= cost;
         }
 
-        public bool TryUseEnergy(int cost)
+        public bool TryUseEnergy(int cost) // cost만큼 에너지 차감 및 변화 알림
         {
             if (!CanUseEnergy(cost))
                 return false;
 
             CurrentEnergy -= cost;
-            OnEnergyChanged?.Invoke(CurrentEnergy, maxEnergy);
+            OnEnergyChanged?.Invoke(CurrentEnergy, runtimeMaxEnergy);
 
             return true;
         }
 
-        public void RefillEnergy()
+        public void RefillEnergy() // 에너지 초기화 및 변화 알림
         {
-            CurrentEnergy = maxEnergy;
-            OnEnergyChanged?.Invoke(CurrentEnergy, maxEnergy);
+            CurrentEnergy = runtimeMaxEnergy;
+            OnEnergyChanged?.Invoke(CurrentEnergy, runtimeMaxEnergy);
         }
 
-        public void RecoverEnergy(int amount)
+        public void RecoverEnergy(int amount) // amount 만큼 에너지 회복
         {
             if (amount <= 0 || IsDead) return;
 
-            CurrentEnergy = Mathf.Min(CurrentEnergy + amount, maxEnergy);
-            OnEnergyChanged?.Invoke(CurrentEnergy, maxEnergy);
+            CurrentEnergy = CurrentEnergy + amount; // 에너지 최대치 이상 회복 가능
+            OnEnergyChanged?.Invoke(CurrentEnergy, runtimeMaxEnergy);
         }
     }
 }

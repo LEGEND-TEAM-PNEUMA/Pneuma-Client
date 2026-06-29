@@ -20,8 +20,17 @@ namespace Pneuma.Unit
 
         protected virtual void Awake()
         {
+            InitializeStatus(maxHp);
+        }
+
+        protected void InitializeStatus(int newMaxHp)
+        {
+            maxHp = newMaxHp;
             CurrentHp = maxHp;
             CurrentShield = 0;
+
+            OnHpChanged?.Invoke(CurrentHp, maxHp);
+            OnShieldChanged?.Invoke(CurrentShield);
         }
 
         public void TakeDamage(int damage)
