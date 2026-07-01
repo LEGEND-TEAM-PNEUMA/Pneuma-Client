@@ -9,7 +9,7 @@ public class CardDataEditor : Editor
     private SerializedProperty cardRarity;
     private SerializedProperty cardCharacter;
     private SerializedProperty cardCost;
-    private SerializedProperty skillGroupID;
+    private SerializedProperty cardSkills;
     private SerializedProperty cardMaxCount;
     private SerializedProperty cardOncePerTurn;
     private SerializedProperty cardExhausts;
@@ -30,7 +30,7 @@ public class CardDataEditor : Editor
         cardRarity = serializedObject.FindProperty("cardRarity");
         cardCharacter = serializedObject.FindProperty("cardCharacter");
         cardCost = serializedObject.FindProperty("cardCost");
-        skillGroupID = serializedObject.FindProperty("skillGroupID");
+        cardSkills = serializedObject.FindProperty("cardSkills");
         cardMaxCount = serializedObject.FindProperty("cardMaxCount");
         cardOncePerTurn = serializedObject.FindProperty("cardOncePerTurn");
         cardExhausts = serializedObject.FindProperty("cardExhausts");
@@ -58,7 +58,7 @@ public class CardDataEditor : Editor
         EndSection();
 
         BeginSection("스킬 데이터");
-        EditorGUILayout.PropertyField(skillGroupID, new GUIContent("스킬 그룹 ID"));
+        EditorGUILayout.PropertyField(cardSkills, new GUIContent("카드 스킬"), true);
         EndSection();
 
         BeginSection("카드 규칙");

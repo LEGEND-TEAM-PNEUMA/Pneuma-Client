@@ -17,7 +17,15 @@ MonoBehaviour:
   cardRarity: 0
   cardCharacter: "\uD14C\uC2A4\uD2B8\uC6A9 \uCE90\uB9AD\uD130"
   cardCost: 0
-  skillGroupID: 55
+  cardSkills:
+  - skillType: 0
+    value: 5
+    target: 2
+    targetCount: 1
+  - skillType: 1
+    value: 4
+    target: 1
+    targetCount: 1
   cardMaxCount: 69
   cardOncePerTurn: 0
   cardExhausts: 0
