@@ -10,5 +10,6 @@ public enum SkillType
     [InspectorName("회복")] Heal,
     [InspectorName("드로우")] Draw,
     [InspectorName("카드 추가")] AddCard,
-    [InspectorName("예언 슬롯 증가")] IncreaseProphecySlot
+    [InspectorName("예언 슬롯 증가")] IncreaseProphecySlot,
+    [InspectorName("에너지 회복")] EnergyHeal
 }
