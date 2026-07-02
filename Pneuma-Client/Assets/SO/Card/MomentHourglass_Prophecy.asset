@@ -1,0 +1,32 @@
+﻿%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 014281e33f2f4a1f8d98a4de38863341, type: 3}
+  m_Name: MomentHourglass_Prophecy
+  m_EditorClassIdentifier: 
+  cardName: "\ucc30\ub098\uc758 \ubaa8\ub798\uc2dc\uacc4(\uc608\uc5b8)"
+  cardType: 5
+  cardRarity: 0
+  cardCharacter: "CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)"
+  cardCost: 0
+  cardSkills: []
+  cardMaxCount: 0
+  cardOncePerTurn: 0
+  cardExhausts: 0
+  cardCanProphecy: 0
+  cardIsProphecy: 0
+  cardIsUpgraded: 0
+  cardUpgradeTarget: {fileID: 11400000, guid: 5a6ba9d399b294f4d26844c5f281e380, type: 2}
+  cardUpgradedFrom: {fileID: 0}
+  cardHasCutscene: 0
+  cardCutsceneSound: {fileID: 0}
+  cardIllust: {fileID: 0}
+  cardDescription: ""
