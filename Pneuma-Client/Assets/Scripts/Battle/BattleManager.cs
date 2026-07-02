@@ -233,6 +233,17 @@ public class BattleManager : MonoBehaviour
         return enemies.Count == 0;
     }
 
+    private void Update() // 디버그용 : 킬 코드 K 키를 눌러 첫 번째 적에게 999 데미지
+    {
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            if (enemies.Count > 0)
+            {
+                enemies[0].TakeDamage(999);
+            }
+        }
+    }   
+
     private void OnDestroy()
     {
         UnsubscribeUnitEvents();

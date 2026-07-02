@@ -55,13 +55,13 @@ namespace Pneuma.Unit
                 OnHpChanged?.Invoke(CurrentHp, maxHp);
             }
 
+            Debug.Log("TakeDamage: " + damage);
+            Debug.Log("CurrentHp: " + CurrentHp);
+
             if (wasAlive && IsDead)
             {
                 OnDeath?.Invoke(this);
             }
-
-            Debug.Log("TakeDamage: " + damage);
-            Debug.Log("CurrentHp: " + CurrentHp);
         }
 
         public void Heal(int amount)
