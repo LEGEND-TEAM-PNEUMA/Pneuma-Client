@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Pneuma.UI.Card
 {
@@ -6,7 +6,23 @@ namespace Pneuma.UI.Card
     // 다른 데이터는 저장하지 않고, 오로지 애니메이션을 위한 컴포넌트입니다.
     public class UICardAnimator : MonoBehaviour
     {
+        public void StartAnimation()
+        {
+            Debug.Log("[UICardAnimator] 등장 애니메이션 시작");
+        }
+        private void CardAppearAnimation()
+        {
 
+        }
+        private void CardDisappearAnimation()
+        {
+
+        }
+
+        private void LateUpdate()
+        {
+            // TODO: 카드가 드래그 상태일 시 마우스를 바로 따라가지 않고 약간 딜레이를 주며 따라가는 연출 구현
+        }
     }
 
 }
