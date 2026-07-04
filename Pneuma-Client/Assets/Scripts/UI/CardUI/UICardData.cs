@@ -3,8 +3,7 @@
 namespace Pneuma.UI.Card
 {
     // 현재 UI 카드 오브젝트가 가지고 있는 카드 데이터와 애니메이션 코드를 관리하는 컴포넌트입니다.
-    [RequireComponent(typeof(UICardVisual))]
-    [RequireComponent(typeof(UICardAnimator))]
+    // 표기(UICardVisual)·연출(UICardAnimator)은 자식 Visual 오브젝트에 위치합니다.
     public class UICardData : MonoBehaviour
     {
         [SerializeField] private CardData cardData;
@@ -16,8 +15,8 @@ namespace Pneuma.UI.Card
 
         private void Start()
         {
-            cardVisual = GetComponent<UICardVisual>();
-            cardAnimator = GetComponent<UICardAnimator>();
+            cardVisual = GetComponentInChildren<UICardVisual>();
+            cardAnimator = GetComponentInChildren<UICardAnimator>();
 
             if (cardData == null)
             {
