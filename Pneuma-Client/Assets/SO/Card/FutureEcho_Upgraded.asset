@@ -1,0 +1,32 @@
+﻿%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 014281e33f2f4a1f8d98a4de38863341, type: 3}
+  m_Name: FutureEcho_Upgraded
+  m_EditorClassIdentifier: 
+  cardName: "\ubbf8\ub798\uc758 \uba54\uc544\ub9ac+"
+  cardType: 0
+  cardRarity: 1
+  cardCharacter: "CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)"
+  cardCost: 2
+  cardSkills: []
+  cardMaxCount: 0
+  cardOncePerTurn: 0
+  cardExhausts: 0
+  cardCanProphecy: 0
+  cardIsProphecy: 0
+  cardIsUpgraded: 1
+  cardUpgradeTarget: {fileID: 0}
+  cardUpgradedFrom: {fileID: 11400000, guid: 5a014fb58db77cd449936787d136b9bf, type: 2}
+  cardHasCutscene: 0
+  cardCutsceneSound: {fileID: 0}
+  cardIllust: {fileID: 0}
+  cardDescription: ""

@@ -5,5 +5,6 @@ public enum CardType
     Buff,
     Debuff,
     Unique,
-    Skill
+    Skill,
+    Power
 }
