@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014281e33f2f4a1f8d98a4de38863341, type: 3}
   m_Name: Attack
   m_EditorClassIdentifier: 
-  cardName: "\uacf5\uaca9"
+  cardName: "\uACF5\uACA9"
   cardType: 0
   cardRarity: 0
-  cardCharacter: "CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)"
+  cardCharacter: CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)
   cardCost: 1
   cardSkills:
   - skillType: 0
@@ -33,4 +33,5 @@ MonoBehaviour:
   cardHasCutscene: 0
   cardCutsceneSound: {fileID: 0}
   cardIllust: {fileID: 0}
-  cardDescription: "\uc801 1\uccb4\uc5d0\uac8c 5\uc758 \ud53c\ud574\ub97c \uc785\ud78c\ub2e4. \uc608\uc5b8 : \ub79c\ub364\uc801\uc5d0\uac8c 7\uc758 \ud53c\ud574\ub97c \uc785\ud78c\ub2e4."
+  cardDescription: "\uC801 1\uCCB4\uC5D0\uAC8C 5\uC758 \uD53C\uD574\uB97C \uC785\uD78C\uB2E4.
+    \uC608\uC5B8 : \uB79C\uB364\uC801\uC5D0\uAC8C 7\uC758 \uD53C\uD574\uB97C \uC785\uD78C\uB2E4."

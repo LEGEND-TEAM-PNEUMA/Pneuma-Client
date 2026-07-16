@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014281e33f2f4a1f8d98a4de38863341, type: 3}
   m_Name: FutureResonance_Upgraded
   m_EditorClassIdentifier: 
-  cardName: "\ubbf8\ub798\uc758 \uc794\ud5a5+"
+  cardName: "\uBBF8\uB798\uC758 \uC794\uD5A5+"
   cardType: 5
   cardRarity: 0
-  cardCharacter: "CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)"
+  cardCharacter: CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)
   cardCost: 0
   cardSkills: []
   cardMaxCount: 0
@@ -29,4 +29,4 @@ MonoBehaviour:
   cardHasCutscene: 0
   cardCutsceneSound: {fileID: 0}
   cardIllust: {fileID: 0}
-  cardDescription: ""
+  cardDescription: 
