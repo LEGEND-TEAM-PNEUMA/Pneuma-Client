@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Battle;
+using Pneuma.Unit;
 using UnityEngine;
 
 public class _TestCardUseController : MonoBehaviour
@@ -7,6 +9,7 @@ public class _TestCardUseController : MonoBehaviour
     [SerializeField] private CardData testCardData;
     [SerializeField] private CardView cardViewPrefab;
     [SerializeField] private Transform cardParent;
+    [SerializeField] private Enemy testEnemy;
 
     private readonly CardExecutor executor = new CardExecutor();
     private readonly List<CardInstance> displayedCards = new List<CardInstance>();
@@ -53,7 +56,7 @@ public class _TestCardUseController : MonoBehaviour
         CardInstance card = displayedCards[lastIndex];
 
         Debug.Log($"카드 사용: {card.CardName}");
-        executor.Execute(card);
+        executor.Execute(card, testEnemy);
         displayedCards.RemoveAt(lastIndex);
 
         if (lastIndex < displayedViews.Count)
@@ -65,6 +68,11 @@ public class _TestCardUseController : MonoBehaviour
             {
                 Destroy(cardView.gameObject);
             }
+        }
+
+        if (BattleManager.Instance != null)
+        {
+            BattleManager.Instance.ChangeState(BattleState.EnemyTurn);
         }
     }
 

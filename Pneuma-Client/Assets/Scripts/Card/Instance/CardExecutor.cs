@@ -1,13 +1,15 @@
+using Pneuma.Unit;
+
 public class CardExecutor
 {
-    public void Execute(CardInstance card)
+    public void Execute(CardInstance card, Enemy targetEnemy)
     {
         if (card == null)
             return;
 
         CardData data = card.Data;
 
-        if (data.CardSkills == null)
+        if (data == null || data.CardSkills == null)
             return;
 
         for (int i = 0; i < data.CardSkills.Count; i++)
@@ -17,7 +19,17 @@ public class CardExecutor
             if (skill == null)
                 continue;
 
-            // TODO: 전투 효과 시스템 연결 후 스킬 타입별 효과를 적용합니다.
+            switch (skill.SkillType)
+            {
+                case SkillType.Damage:
+                    // 테스트용으로 공격 카드만 더미 적 피해 API에 연결합니다.
+                    targetEnemy?.TakeDamage(skill.Value);
+                    break;
+
+                default:
+                    // TODO: 대상 지정, 회복, 방어도 등 나머지 스킬 타입 처리를 확장합니다.
+                    break;
+            }
         }
     }
 }
