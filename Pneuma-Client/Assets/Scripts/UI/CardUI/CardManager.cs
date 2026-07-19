@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Pneuma.UI.Card
@@ -12,19 +13,24 @@ namespace Pneuma.UI.Card
         PREMANENT
     }
 
-    // 카드 드로우, 더미 및 카드 정렬을 관리합니다.
+    // 카드 더미와 드로우를 관리하는 모델입니다.
+    // 화면(뷰)을 직접 알지 못하며, 카드 이동을 OnCardMoved 이벤트로만 알립니다.
     public class CardManager : MonoBehaviour
     {
-        // 현재 보유 중인 카드 목록 (에디터에서 테스트용 카드를 등록)
-        [SerializeField] private List<UICardData> currentCardList = new List<UICardData>();
+        // 시작 덱 구성 (에디터에서 CardData 에셋을 등록)
+        [SerializeField] private List<CardData> startingDeck = new List<CardData>();
 
         // 시작 시 테스트로 뽑을 카드 수
         [SerializeField] private int testDrawCount = 3;
 
         // 카드들의 현재 상태 및 위치를 확인할 수 있는 딕셔너리 상태의 변수
-        private Dictionary<CardListType, List<UICardData>> cardListDictionary;
+        private Dictionary<CardListType, List<RuntimeCard>> cardListDictionary;
 
-        // public event System.Action<UICardData> OnCardMoved;
+        /// <summary>
+        /// 카드가 더미 사이를 이동할 때 발행됩니다. (카드, 출발 더미, 도착 더미)
+        /// 뷰는 이 이벤트를 구독해 카드 오브젝트를 생성·제거합니다.
+        /// </summary>
+        public event Action<RuntimeCard, CardListType, CardListType> OnCardMoved;
 
         private void Awake()
         {
@@ -33,43 +39,55 @@ namespace Pneuma.UI.Card
 
         private void Start()
         {
-            // 테스트: 시작 시 지정한 수만큼 드로우하여 콘솔 로그로 흐름을 확인합니다.
+            // 테스트: 시작 시 덱을 구성하고 지정한 수만큼 드로우합니다.
+            InitializeDeck();
             DrawCards(testDrawCount);
-        }
-
-        /// <summary>
-        /// 첫 게임 시작 시 손패 카드를 뽑는 함수입니다.
-        /// </summary>
-        /// <param name="count">처음 뽑는 카드 수</param>
-        public void DrawCards(int count)
-        {
-            cardListDictionary[CardListType.DRAW] = new List<UICardData>(currentCardList);
-
-            Debug.Log($"[CardManager] 드로우 시작 - 덱 {cardListDictionary[CardListType.DRAW].Count}장 중 {count}장 뽑기");
-
-            // 카드를 뽑으면 해당 카드는 handCardList로 이동
-            // drawCardList에서는 제거
-            for(int i = 0; i < count; i++)
-            {
-                DrawCard();
-            }
-
-            Debug.Log($"[CardManager] 드로우 완료 - 손패 {cardListDictionary[CardListType.HAND].Count}장");
         }
 
         private void InitializeDictionary()
         {
-            cardListDictionary = new Dictionary<CardListType, List<UICardData>>();
+            cardListDictionary = new Dictionary<CardListType, List<RuntimeCard>>();
 
             // 총 5개의 형태의 리스트 생성(드로우, 손패, 버림, 소멸, 영구)
-            for(int i = 0; i < 5; i++)
-                cardListDictionary.Add((CardListType)i, new List<UICardData>());
+            for (int i = 0; i < 5; i++)
+                cardListDictionary.Add((CardListType)i, new List<RuntimeCard>());
+        }
+
+        /// <summary>
+        /// 시작 덱의 CardData를 런타임 카드로 만들어 드로우 더미에 채웁니다.
+        /// </summary>
+        public void InitializeDeck()
+        {
+            List<RuntimeCard> drawPile = cardListDictionary[CardListType.DRAW];
+            drawPile.Clear();
+
+            foreach (CardData data in startingDeck)
+            {
+                if (data == null) continue;
+                drawPile.Add(new RuntimeCard(data));
+            }
+
+            Debug.Log($"[CardManager] 덱 구성 완료 - {drawPile.Count}장");
+        }
+
+        /// <summary>
+        /// 지정한 수만큼 카드를 뽑습니다.
+        /// </summary>
+        /// <param name="count">뽑을 카드 수</param>
+        public void DrawCards(int count)
+        {
+            Debug.Log($"[CardManager] 드로우 시작 - 덱 {cardListDictionary[CardListType.DRAW].Count}장 중 {count}장 뽑기");
+
+            for (int i = 0; i < count; i++)
+                DrawCard();
+
+            Debug.Log($"[CardManager] 드로우 완료 - 손패 {cardListDictionary[CardListType.HAND].Count}장");
         }
 
         // 랜덤한 드로우 더미의 카드를 손패로 이동합니다.
         public void DrawCard()
         {
-            var drawPile = cardListDictionary[CardListType.DRAW];
+            List<RuntimeCard> drawPile = cardListDictionary[CardListType.DRAW];
             if (drawPile.Count == 0)
             {
                 Debug.LogWarning("[CardManager] 뽑을 카드가 없습니다. (DRAW 더미 비어있음)");
@@ -77,10 +95,24 @@ namespace Pneuma.UI.Card
             }
 
             // 드로우 더미 중 랜덤하게 카드를 뽑음
-            int rand = Random.Range(0, drawPile.Count);
-            UICardData card = drawPile[rand];
-            MoveCard(CardListType.DRAW, CardListType.HAND, card);
+            int rand = UnityEngine.Random.Range(0, drawPile.Count);
+            MoveCard(CardListType.DRAW, CardListType.HAND, drawPile[rand]);
         }
+
+        /// <summary>
+        /// 손패의 카드를 버림 더미로 보냅니다.
+        /// </summary>
+        /// <param name="card">버릴 카드</param>
+        public void DiscardCard(RuntimeCard card)
+        {
+            MoveCard(CardListType.HAND, CardListType.DISCARD, card);
+        }
+
+        /// <summary>
+        /// 특정 더미의 카드 목록을 읽기 전용으로 반환합니다.
+        /// </summary>
+        /// <param name="type">조회할 더미 타입</param>
+        public IReadOnlyList<RuntimeCard> GetCards(CardListType type) => cardListDictionary[type];
 
         public void SetCurrentCard()
         {
@@ -94,23 +126,16 @@ namespace Pneuma.UI.Card
         /// <param name="from">시작 리스트</param>
         /// <param name="to">목적지 리스트</param>
         /// <param name="card">카드 요소</param>
-        private void MoveCard(CardListType from, CardListType to, UICardData card)
+        private void MoveCard(CardListType from, CardListType to, RuntimeCard card)
         {
+            if (card == null) return;
             if (!cardListDictionary[from].Remove(card)) return;
             cardListDictionary[to].Add(card);
 
-            string cardName = card != null && card.CardData != null ? card.CardData.CardName : "Unknown";
-            Debug.Log($"[CardManager] 카드 이동: {cardName} ({from} → {to})");
+            Debug.Log($"[CardManager] 카드 이동: {card.CardName} ({from} → {to})");
+
+            OnCardMoved?.Invoke(card, from, to);
         }
-
-        /// <summary>
-        /// 카드 요소가 가고자 하는 리스트에 존재하는지 확인(중복 방지)
-        /// </summary>
-        /// <param name="type">검사하고자 하는 카드 리스트의 타입</param>
-        /// <param name="card">카드 요소</param>
-        /// <returns></returns>
-        //private bool IsContain(CardListType type, UICardData card) => cardListDictionary[type].Contains(card);
-
     }
 
 }
