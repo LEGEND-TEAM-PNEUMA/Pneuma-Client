@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Pneuma.UI.Card
 {
-    // 카드를 드래그하여 이동시킵니다.
-    // 마우스를 즉시 따라가지 않고 약간 지연(관성)을 주며 따라갑니다.
+    // 카드의 위치·회전을 소유하는 유일한 컴포넌트입니다.
+    // 평소에는 정렬이 지정한 제자리(home)를, 드래그 중에는 마우스를 지연 추적합니다.
+    // 정렬(CardHandLayout)은 위치를 직접 쓰지 않고 SetHome()으로 목표만 알려줍니다.
     [RequireComponent(typeof(RectTransform))]
     public class UICardDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
@@ -19,8 +20,11 @@ namespace Pneuma.UI.Card
         private RectTransform rectTransform;
         private Canvas canvas;
 
-        private Vector2 homePosition;      // 드래그 취소 시 복귀 위치
-        private Vector2 targetPosition;    // 지연 추적 목표
+        private Vector2 homePosition;      // 정렬이 지정한 제자리
+        private float homeRotation;        // 정렬이 지정한 부채꼴 각도
+        private Vector2 dragTarget;        // 드래그 중 추적 목표
+        private bool isDragging;
+
         private Vector2 followVelocity;    // 위치 SmoothDamp 내부 속도
         private float tiltVelocity;        // 각도 SmoothDamp 내부 속도
 
@@ -28,41 +32,63 @@ namespace Pneuma.UI.Card
         {
             rectTransform = GetComponent<RectTransform>();
             canvas = GetComponentInParent<Canvas>();
-            targetPosition = rectTransform.anchoredPosition;
+
+            // 정렬이 없는 경우(씬 배치 카드)에도 제자리를 유지하도록 현재 위치를 기본값으로 둔다.
+            homePosition = rectTransform.anchoredPosition;
+            homeRotation = rectTransform.localEulerAngles.z;
+        }
+
+        /// <summary>
+        /// 정렬이 계산한 제자리를 지정합니다. 드래그 중이 아니면 카드가 이쪽으로 돌아갑니다.
+        /// </summary>
+        /// <param name="position">부모 기준 목표 위치(anchoredPosition)</param>
+        /// <param name="rotation">부채꼴 각도(Z)</param>
+        public void SetHome(Vector2 position, float rotation)
+        {
+            homePosition = position;
+            homeRotation = rotation;
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            homePosition = rectTransform.anchoredPosition;
+            // 현재 위치에서 시작해야 잡는 순간 카드가 튀지 않는다.
+            dragTarget = rectTransform.anchoredPosition;
+            isDragging = true;
         }
 
         public void OnDrag(PointerEventData eventData)
         {
             // 즉시 이동하지 않고 "목표"만 갱신 → 실제 이동은 Update에서 지연 추적
             float scale = canvas != null ? canvas.scaleFactor : 1f;
-            targetPosition += eventData.delta / scale;
+            dragTarget += eventData.delta / scale;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            // TODO(#27): 드롭 위치에 따라 카드 사용/취소 판정. 지금은 원위치로 복귀.
-            targetPosition = homePosition;
+            // TODO(#27): 드롭 위치에 따라 카드 사용/취소 판정.
+            // 지금은 드래그만 풀면 Update가 알아서 제자리(home)로 되돌린다.
+            isDragging = false;
         }
 
         private void Update()
         {
-            // 1) 위치: 목표를 부드럽게 추적 → 지연(관성) 발생
+            // 1) 위치: 드래그 중이면 마우스를, 아니면 정렬이 지정한 제자리를 추적
+            Vector2 target = isDragging ? dragTarget : homePosition;
+
             rectTransform.anchoredPosition = Vector2.SmoothDamp(
-                rectTransform.anchoredPosition, targetPosition, ref followVelocity, followTime);
+                rectTransform.anchoredPosition, target, ref followVelocity, followTime);
 
             // 2) 회전: 목표와의 가로 간격(뒤처진 정도)에 비례해 기울임
-            //    → 따라잡을수록 간격이 줄어 자연히 0으로 복귀
-            float gap = targetPosition.x - rectTransform.anchoredPosition.x;
-            float targetTilt = Mathf.Clamp(-gap * tiltAmount, -maxTilt, maxTilt);
+            //    → 따라잡을수록 간격이 줄어 자연히 기준 각도로 복귀
+            float gap = target.x - rectTransform.anchoredPosition.x;
+            float lean = Mathf.Clamp(-gap * tiltAmount, -maxTilt, maxTilt);
+
+            // 드래그 중에는 부채꼴 각도를 풀어 정면(0도)을 기준으로 삼는다.
+            float baseRotation = isDragging ? 0f : homeRotation;
 
             // 각도 자체도 부드럽게 보간해 스냅/떨림 제거 (SmoothDampAngle: 360도 wrap 처리)
             float newZ = Mathf.SmoothDampAngle(
-                rectTransform.localEulerAngles.z, targetTilt, ref tiltVelocity, tiltSmoothTime);
+                rectTransform.localEulerAngles.z, baseRotation + lean, ref tiltVelocity, tiltSmoothTime);
             rectTransform.localRotation = Quaternion.Euler(0f, 0f, newZ);
         }
     }
