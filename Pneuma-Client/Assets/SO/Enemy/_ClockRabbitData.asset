@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06364211bce419d479a6fa54584aa52b, type: 3}
-  m_Name: _TestEnemyData
+  m_Name: _ClockRabbitData
   m_EditorClassIdentifier: 
   enemyId: 1
-  enemyName: Bunny
-  maxHp: 100
+  enemyName: "\uC2DC\uACC4 \uD1A0\uB07C"
+  maxHp: 45
+  behaviorData: {fileID: 11400000, guid: 820f68e1f9cecb845ad22becea1e42d0, type: 2}
   enemySprite: {fileID: 0}
   animatorController: {fileID: 0}
