@@ -72,7 +72,15 @@ namespace Pneuma.UI.Card
             for (int i = 0; i < cardCount; i++)
             {
                 UICardData card = cards[i];
-                if (card == null || card.CardDrag == null) continue;
+                if (card == null) continue;
+
+                // 손패 순서를 카드에 알려준다. 호버가 올렸던 렌더 순서를 되돌릴 때 기준이 된다.
+                card.SetHandIndex(i);
+
+                // 렌더 순서도 손패 순서와 맞춰 오른쪽 카드가 위로 겹치게 한다.
+                card.transform.SetSiblingIndex(i);
+
+                if (card.CardDrag == null) continue;
 
                 GetSlot(i - mid, out Vector2 position, out float rotation);
                 card.CardDrag.SetHome(position, rotation);
