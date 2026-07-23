@@ -28,6 +28,20 @@ namespace Pneuma.UI.Card
         private Vector2 followVelocity;    // 위치 SmoothDamp 내부 속도
         private float tiltVelocity;        // 각도 SmoothDamp 내부 속도
 
+        /// <summary>
+        /// 카드를 집을 수 있는지 여부입니다. 코스트가 부족하거나 퇴장 중인 카드는 false가 됩니다.
+        /// 컴포넌트를 끄지 않고 이 값만 내리는 이유는, 꺼버리면 Update가 멈춰
+        /// 정렬이 새 자리를 알려줘도 카드가 따라가지 못하기 때문입니다.
+        /// </summary>
+        public bool Interactable { get; set; } = true;
+
+        /// <summary>
+        /// 지금 드래그 중인지 여부입니다.
+        /// 카드가 커서를 늦게 따라오는 탓에 드래그 중에도 커서가 카드 밖으로 나갈 수 있어,
+        /// 호버 쪽에서 이 값을 보고 상태를 유지할지 판단합니다.
+        /// </summary>
+        public bool IsDragging => isDragging;
+
         private void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
@@ -51,6 +65,8 @@ namespace Pneuma.UI.Card
 
         public void OnBeginDrag(PointerEventData eventData)
         {
+            if (!Interactable) return;
+
             // 현재 위치에서 시작해야 잡는 순간 카드가 튀지 않는다.
             dragTarget = rectTransform.anchoredPosition;
             isDragging = true;
@@ -58,6 +74,9 @@ namespace Pneuma.UI.Card
 
         public void OnDrag(PointerEventData eventData)
         {
+            // OnBeginDrag를 거절해도 OnDrag는 계속 들어오므로 여기서도 막는다.
+            if (!isDragging) return;
+
             // 즉시 이동하지 않고 "목표"만 갱신 → 실제 이동은 Update에서 지연 추적
             float scale = canvas != null ? canvas.scaleFactor : 1f;
             dragTarget += eventData.delta / scale;

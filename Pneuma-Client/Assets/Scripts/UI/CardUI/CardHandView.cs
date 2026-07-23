@@ -79,12 +79,13 @@ namespace Pneuma.UI.Card
         {
             if (!spawnedCards.TryGetValue(card, out UICardData cardObject)) return;
 
+            // 연출이 끝나기 전에 목록에서 빼둔다. 그래야 남은 카드가 빈자리를 곧바로 메운다.
             spawnedCards.Remove(card);
             handCards.Remove(cardObject);
 
-            // TODO(#25): 퇴장 애니메이션 후 제거하도록 변경 (현재는 즉시 파괴)
+            // 퇴장 연출이 끝난 뒤에 파괴한다. 파괴는 여기서만 하고, 연출은 카드가 스스로 맡는다.
             if (cardObject != null)
-                Destroy(cardObject.gameObject);
+                cardObject.PlayDisappear(() => Destroy(cardObject.gameObject));
 
             Debug.Log($"[CardHandView] 카드 제거: {card.CardName} (손패 {spawnedCards.Count}장)");
 
