@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 014281e33f2f4a1f8d98a4de38863341, type: 3}
+  m_Name: LightRevelation_Prophecy
+  m_EditorClassIdentifier: 
+  cardName: "\uBE5B\uC758 \uACC4\uC2DC(\uC608\uC5B8)"
+  cardType: 0
+  cardRarity: 0
+  cardCharacter: CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)
+  cardCost: 0
+  cardSkills:
+  - skillType: 0
+    value: 9
+    target: 2
+    targetCount: 1
+  cardMaxCount: 5
+  cardOncePerTurn: 0
+  cardExhausts: 0
+  cardCanProphecy: 0
+  cardIsProphecy: 0
+  cardIsUpgraded: 0
+  cardUpgradeTarget: {fileID: 11400000, guid: 91e8346d8a48b769960c49566f553ab0, type: 2}
+  cardUpgradedFrom: {fileID: 0}
+  cardHasCutscene: 0
+  cardCutsceneSound: {fileID: 0}
+  cardIllust: {fileID: 0}
+  cardDescription: "\uC801 1\uCCB4\uC5D0\uAC8C 6\uC758 \uD53C\uD574\uB97C \uC785\uD78C\uB2E4.
+    \uC608\uC5B8 : \uB79C\uB364\uC801\uC5D0\uAC8C 6\uC758\uD53C\uD574\uB97C \uC785\uD788\uACE0,
+    \uC790\uC2E0\uC5D0\uAC8C \uBC29\uC5B4\uB3C4\uB97C 4\uBD80\uC5EC\uD55C\uB2E4."

@@ -18,17 +18,26 @@ namespace Pneuma.Unit
         public event Action<int> OnShieldChanged;
         public event Action<CharacterBase> OnDeath;
 
-        private void Awake()
+        protected virtual void Awake()
         {
+            InitializeStatus(maxHp);
+        }
+
+        protected void InitializeStatus(int newMaxHp)
+        {
+            maxHp = newMaxHp;
             CurrentHp = maxHp;
             CurrentShield = 0;
+
+            OnHpChanged?.Invoke(CurrentHp, maxHp);
+            OnShieldChanged?.Invoke(CurrentShield);
         }
 
         public void TakeDamage(int damage)
         {
             if (damage <= 0 || IsDead) return;
 
-            bool wasAlive = !IsDead; //OnDeath 중복 호출 방지
+            bool wasAlive = !IsDead;
             int remainingDamage = damage;
 
             if (CurrentShield > 0)
@@ -36,6 +45,7 @@ namespace Pneuma.Unit
                 int blockedDamage = Mathf.Min(CurrentShield, remainingDamage);
                 CurrentShield -= blockedDamage;
                 remainingDamage -= blockedDamage;
+
                 OnShieldChanged?.Invoke(CurrentShield);
             }
 
@@ -45,33 +55,33 @@ namespace Pneuma.Unit
                 OnHpChanged?.Invoke(CurrentHp, maxHp);
             }
 
+            Debug.Log("TakeDamage: " + damage);
+            Debug.Log("CurrentHp: " + CurrentHp);
+
             if (wasAlive && IsDead)
             {
-                // 사망 판단
                 OnDeath?.Invoke(this);
             }
-
-            Debug.Log("TakeDamage:" + damage);
-            Debug.Log("CurrentHp:" + CurrentHp);
         }
 
         public void Heal(int amount)
         {
             if (amount <= 0 || IsDead) return;
-            
+
             int prevHp = CurrentHp;
             CurrentHp = Mathf.Min(CurrentHp + amount, maxHp);
 
             if (prevHp == CurrentHp) return;
+
             OnHpChanged?.Invoke(CurrentHp, maxHp);
 
-            Debug.Log("Heal:" + amount);
-            Debug.Log("CurrentHp:" + CurrentHp);
+            Debug.Log("Heal: " + amount);
+            Debug.Log("CurrentHp: " + CurrentHp);
         }
 
         public void IncreaseMaxHp(int amount)
         {
-            if (amount <= 0) return;
+            if (amount <= 0 || IsDead) return;
 
             maxHp += amount;
             CurrentHp += amount;
@@ -86,14 +96,14 @@ namespace Pneuma.Unit
             CurrentShield += amount;
             OnShieldChanged?.Invoke(CurrentShield);
 
-            Debug.Log("AddShield:" + amount);
-            Debug.Log("CurrentShield:" + CurrentShield);
+            Debug.Log("AddShield: " + amount);
+            Debug.Log("CurrentShield: " + CurrentShield);
         }
 
         public void ClearShield()
         {
             if (CurrentShield == 0) return;
-            
+
             CurrentShield = 0;
             OnShieldChanged?.Invoke(CurrentShield);
         }

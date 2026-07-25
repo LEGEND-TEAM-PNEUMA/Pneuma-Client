@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "CardData", menuName = "Pneuma/Card/Card Data")]
@@ -9,7 +10,7 @@ public class CardData : ScriptableObject
     [SerializeField] private string cardCharacter;
     [SerializeField, Range(0, 3)] private int cardCost;
 
-    [SerializeField, Min(0)] private int skillGroupID;
+    [SerializeField] private List<CardSkill> cardSkills = new List<CardSkill>();
 
     [SerializeField, Min(0)] private int cardMaxCount;
     [SerializeField] private bool cardOncePerTurn;
@@ -32,7 +33,7 @@ public class CardData : ScriptableObject
     public CardRarity CardRarity => cardRarity;
     public string CardCharacter => cardCharacter;
     public int CardCost => cardCost;
-    public int SkillGroupID => skillGroupID;
+    public IReadOnlyList<CardSkill> CardSkills => cardSkills;
     public int CardMaxCount => cardMaxCount;
     public bool CardOncePerTurn => cardOncePerTurn;
     public bool CardExhausts => cardExhausts;
