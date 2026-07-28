@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
 public class RabbitAnimationController : MonoBehaviour
@@ -7,6 +7,7 @@ public class RabbitAnimationController : MonoBehaviour
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int HitHash = Animator.StringToHash("Hit");
     private static readonly int DefeatHash = Animator.StringToHash("Defeat");
+    private static readonly int RunHash = Animator.StringToHash("Run");
 
     private Animator animator;
     private bool isDefeated;
@@ -50,6 +51,16 @@ public class RabbitAnimationController : MonoBehaviour
         animator.SetTrigger(DefeatHash);
     }
 
+    public void PlayRun()
+    {
+        if (isDefeated)
+        {
+            return;
+        }
+
+        animator.SetTrigger(RunHash);
+    }
+
     public void ResetAnimationState()
     {
         isDefeated = false;
@@ -57,6 +68,7 @@ public class RabbitAnimationController : MonoBehaviour
         animator.ResetTrigger(AttackHash);
         animator.ResetTrigger(HitHash);
         animator.ResetTrigger(DefeatHash);
+        animator.ResetTrigger(RunHash);
 
         animator.Play(IdleHash, 0, 0f);
     }
