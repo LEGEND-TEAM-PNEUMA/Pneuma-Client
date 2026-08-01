@@ -85,6 +85,9 @@ public class _TestCardUseController : MonoBehaviour
         }
 
         Debug.Log($"카드 사용: {card.CardName}");
+
+        // 카드 순환 상태 변경은 CardCycleManager가 담당하고,
+        // 실제 카드 효과 실행은 테스트 컨트롤러가 담당합니다.
         executor.Execute(card, testEnemy);
 
         cardView.Clicked -= UseCard;

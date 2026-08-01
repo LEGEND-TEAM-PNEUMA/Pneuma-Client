@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Pneuma.Card.Management
 {
+    /// <summary>
+    /// 드로우 더미와 버린 카드 더미를 관리합니다.
+    /// </summary>
     public class DeckManager
     {
         private readonly List<CardInstance> drawPile = new List<CardInstance>();
@@ -19,6 +22,10 @@ namespace Pneuma.Card.Management
             this.random = random ?? new Random();
         }
 
+        /// <summary>
+        /// 전달받은 카드 데이터로 드로우 더미를 초기화하고 버린 카드 더미를 비웁니다.
+        /// 셔플은 호출자가 별도로 수행합니다.
+        /// </summary>
         public void Initialize(IEnumerable<CardData> cards)
         {
             drawPile.Clear();
@@ -40,11 +47,18 @@ namespace Pneuma.Card.Management
             }
         }
 
+        /// <summary>
+        /// 현재 드로우 더미의 카드 순서를 무작위로 섞습니다.
+        /// </summary>
         public void Shuffle()
         {
             Shuffle(drawPile);
         }
 
+        /// <summary>
+        /// 드로우 더미에서 카드 한 장을 꺼냅니다.
+        /// 드로우 더미가 비어 있으면 버린 카드 더미를 드로우 더미로 재구성하고 셔플합니다.
+        /// </summary>
         public bool TryDraw(out CardInstance card)
         {
             if (drawPile.Count == 0)
@@ -64,6 +78,9 @@ namespace Pneuma.Card.Management
             return true;
         }
 
+        /// <summary>
+        /// 카드를 버린 카드 더미로 이동합니다.
+        /// </summary>
         public void Discard(CardInstance card)
         {
             if (card == null || discardPile.Contains(card))
