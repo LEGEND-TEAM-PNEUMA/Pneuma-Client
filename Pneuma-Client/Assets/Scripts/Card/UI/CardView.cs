@@ -1,7 +1,9 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Button))]
 public class CardView : MonoBehaviour
 {
     [Header("Text")]
@@ -12,7 +14,17 @@ public class CardView : MonoBehaviour
     [Header("Image")]
     [SerializeField] private Image cardImage;
 
+    private Button button;
+
     public CardInstance BoundCard { get; private set; }
+    public event Action<CardView> Clicked;
+
+    private void Awake()
+    {
+        button = GetComponent<Button>();
+        button.onClick.AddListener(HandleClick);
+        button.interactable = false;
+    }
 
     public void SetDisplayReferences(
         TMP_Text cardNameText,
@@ -29,6 +41,7 @@ public class CardView : MonoBehaviour
     public void Bind(CardInstance card)
     {
         BoundCard = card;
+        button.interactable = card != null;
         Refresh();
     }
 
@@ -70,5 +83,23 @@ public class CardView : MonoBehaviour
         }
 
         target.text = value;
+    }
+
+    private void HandleClick()
+    {
+        if (BoundCard == null)
+        {
+            return;
+        }
+
+        Clicked?.Invoke(this);
+    }
+
+    private void OnDestroy()
+    {
+        if (button != null)
+        {
+            button.onClick.RemoveListener(HandleClick);
+        }
     }
 }
