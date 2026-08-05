@@ -16,5 +16,5 @@ MonoBehaviour:
   enemyName: "\uC2DC\uACC4 \uD1A0\uB07C"
   maxHp: 45
   behaviorData: {fileID: 11400000, guid: 820f68e1f9cecb845ad22becea1e42d0, type: 2}
-  enemySprite: {fileID: 0}
-  animatorController: {fileID: 0}
+  enemySprite: {fileID: 6937817954938267909, guid: 66fc6cfb92a67914f9e45bf8cbdab323, type: 3}
+  animatorController: {fileID: 9100000, guid: 15160109c2fbbc8469f72a6c7ed3b7ca, type: 2}

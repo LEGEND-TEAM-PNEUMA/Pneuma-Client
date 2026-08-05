@@ -3,6 +3,15 @@ using UnityEngine;
 
 namespace Pneuma.Unit
 {
+    public enum EnemyActionType
+    {
+        Attack,
+        Defense,
+        Buff,
+        Debuff,
+        Unique // 특수기 : 도주, 상태이상, 소환 등
+    }
+
     public enum EnemyActionSelectionType
     {
         RandomPool,
@@ -18,6 +27,7 @@ namespace Pneuma.Unit
     {
         [Header("Action Info")]
         [SerializeField] private string actionName;
+        [SerializeField] private EnemyActionType actionType;
         [SerializeField] private int skillGroupId;
 
         [Header("Selection Rule")]
@@ -39,6 +49,7 @@ namespace Pneuma.Unit
         [SerializeField, Min(0)] private int cooldownTurns;
 
         public string ActionName => actionName;
+        public EnemyActionType ActionType => actionType;
         public int SkillGroupId => skillGroupId;
         public EnemyActionSelectionType SelectionType => selectionType;
         public int FixedTurn => fixedTurn;

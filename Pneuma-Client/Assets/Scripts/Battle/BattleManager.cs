@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Battle;
 using Pneuma.Unit;
+using System.Collections;
 
 public class BattleManager : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class BattleManager : MonoBehaviour
     public event Action<BattleState> OnBattleStateChanged;
 
     private bool isBattleStarted; // 전투 시작 여부를 추적하는 플래그
+    private Coroutine enemyTurnCoroutine;
 
     private void Awake() // 싱글톤 패턴
     {
@@ -163,6 +165,9 @@ public class BattleManager : MonoBehaviour
     private void EnterBattleStart() // 전투 시작 : 인트로, 덱 초기화
     {
         Debug.Log("[BattleManager] Battle Start");
+        int firstTurn = CurrentTurn + 1;
+        PredictEnemyActions(firstTurn);
+
         // 배틀 인트로 UI, 배경 음악 재생 등 초기화 작업 수행
     }
 
@@ -184,11 +189,41 @@ public class BattleManager : MonoBehaviour
         // deckManager.DrawForTurn();
     }
 
+    /// 플레이어의 턴 종료 요청을 받아 EnemyTurn으로 전환한다.
+    public void EndPlayerTurn()
+    {
+        if (!isBattleStarted)
+        {
+            Debug.LogWarning(
+                "[BattleManager] 전투가 시작되지 않아 PlayerTurn을 종료할 수 없습니다.");
+
+            return;
+        }
+
+        if (CurrentState != BattleState.PlayerTurn)
+        {
+            Debug.LogWarning(
+                $"[BattleManager] PlayerTurn에서만 턴을 종료할 수 있습니다. " +
+                $"CurrentState: {CurrentState}");
+
+            return;
+        }
+
+        ChangeState(BattleState.EnemyTurn);
+    }
+
     private void EnterEnemyTurn() // 적 턴 시작 : 행동 수행 후 다음 행동 큐에 넣고 턴 종료
     {
-        Debug.Log("[BattleManager] Enemy Turn Started");
+        if (enemyTurnCoroutine != null)
+        {
+            Debug.LogWarning(
+                "[BattleManager] EnemyTurn이 이미 실행 중입니다.");
 
-        // TODO: EnemyTurnController 또는 EnemyActionController 연결
+            return;
+        }
+
+        enemyTurnCoroutine =
+            StartCoroutine(ExecuteEnemyTurnRoutine());
     }
 
     private void EnterVictory()
@@ -243,6 +278,72 @@ public class BattleManager : MonoBehaviour
             }
         }
     }   
+
+    /// 살아 있는 모든 적이 지정된 턴에 실행할 행동을 예견한다.
+    private void PredictEnemyActions(int targetTurn)
+    {
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy == null || enemy.IsDead)
+                continue;
+
+            enemy.PredictAction(targetTurn);
+        }
+    }
+
+    /// 현재 살아 있는 적들이 미리 예견한 행동을 순서대로 실행한다.
+    /// 모든 행동이 끝나면 다음 턴 행동을 예견하고 PlayerTurn으로 복귀한다.
+    private IEnumerator ExecuteEnemyTurnRoutine()
+    {
+        Debug.Log(
+            $"[BattleManager] Enemy Turn Started. Turn: {CurrentTurn}");
+
+        List<Enemy> actingEnemies =
+            new List<Enemy>(enemies);
+
+        foreach (Enemy enemy in actingEnemies)
+        {
+            // 행동 도중 Victory 또는 Defeat 등으로 상태가 바뀌면 중단한다.
+            if (CurrentState != BattleState.EnemyTurn)
+            {
+                enemyTurnCoroutine = null;
+                yield break;
+            }
+
+            if (enemy == null || enemy.IsDead)
+                continue;
+
+            if (currentPlayer == null || currentPlayer.IsDead)
+                break;
+
+            yield return enemy.ExecutePredictedAction(
+                CurrentTurn,
+                currentPlayer);
+        }
+
+        enemyTurnCoroutine = null;
+
+        // 마지막 행동 실행 도중 Victory/Defeat로 전환됐다면
+        // 다음 턴 예견과 PlayerTurn 복귀를 진행하지 않는다.
+        if (CurrentState != BattleState.EnemyTurn)
+        {
+            Debug.Log(
+                $"[BattleManager] Enemy Turn 종료 시점에 " +
+                $"{CurrentState} 상태라 턴 전환을 중단합니다.");
+
+            yield break;
+        }
+
+        Debug.Log(
+            $"[BattleManager] Enemy Turn Actions Completed. " +
+            $"Turn: {CurrentTurn}");
+
+        // 다음 PlayerTurn에서 보여줄 적 행동을 먼저 결정한다.
+        int nextTurn = CurrentTurn + 1;
+        PredictEnemyActions(nextTurn);
+
+        ChangeState(BattleState.PlayerTurn);
+    }
 
     private void OnDestroy()
     {

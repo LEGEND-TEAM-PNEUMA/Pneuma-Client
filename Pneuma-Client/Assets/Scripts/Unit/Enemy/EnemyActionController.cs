@@ -50,8 +50,10 @@ public class EnemyActionController : MonoBehaviour
         }
 
         Debug.Log(
-            $"[EnemyActionController] {name} 예견 행동: " +
-            $"{PredictedAction.Data.ActionName}");
+            $"[EnemyActionController] {name} {targetTurn}턴 예견 행동: " +
+            $"{PredictedAction.Data.ActionName} " +
+            $"(Type: {PredictedAction.Data.SelectionType}, " +
+            $"Phase: {currentPhase})");
 
         OnActionPredicted?.Invoke(PredictedAction.Data);
     }
@@ -78,12 +80,22 @@ public class EnemyActionController : MonoBehaviour
             yield break;
         }
 
+        Debug.Log(
+            $"[EnemyActionController] {name} {currentTurn}턴 행동 실행 시작: " +
+            $"{executingAction.Data.ActionName}");
+
         yield return actionExecutor.Execute(
             owner,
             target,
             executingAction.Data);
 
         executingAction.MarkUsed(currentTurn);
+
+        Debug.Log(
+            $"[EnemyActionController] {name} {currentTurn}턴 행동 실행 완료: " +
+            $"{executingAction.Data.ActionName} " +
+            $"(UseCount: {executingAction.UseCount}, " +
+            $"LastUsedTurn: {executingAction.LastUsedTurn})");
     }
 
     private EnemyActionRuntime SelectAction(
@@ -145,6 +157,11 @@ public class EnemyActionController : MonoBehaviour
 
         if (candidates.Count == 0)
             return null;
+
+        Debug.Log(
+            $"[EnemyActionController] {name} {targetTurn}턴 후보 " +
+            $"({candidates.Count}개): " +
+            $"{string.Join(", ", candidates.ConvertAll(c => c.Data.ActionName))}");
 
         int randomIndex = UnityEngine.Random.Range(
             0,
