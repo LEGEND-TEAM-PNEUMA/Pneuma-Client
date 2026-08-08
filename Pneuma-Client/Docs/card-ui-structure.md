@@ -1,6 +1,6 @@
 # 카드 UI 시스템 구조
 
-> 작성일: 2026-07-14 · 최종 수정: 2026-07-25 · 기준 브랜치: `feature/game-ui`
+> 작성일: 2026-07-14 · 최종 수정: 2026-08-08 · 기준 브랜치: `develop`
 > 대상: `Assets/Scripts/UI/CardUI/`, `Assets/Scripts/Card/`, `Assets/Scripts/Battle/`
 
 카드의 데이터 → 표기 → 정렬 → 연출 → 입력을 담당하는 UI 시스템의 **현재 구조**를 정리한 문서입니다.
@@ -26,7 +26,8 @@ Assets/Scripts/
 │   ├── UICardVisual.cs         # 뷰: 데이터를 UI로 표기
 │   ├── UICardAnimator.cs       # 연출: 등장/호버/퇴장 트윈 (자식 Visual 대상)
 │   ├── UICardDrag.cs           # 입력: 드래그 이동 (루트 위치·회전 소유)
-│   └── UICardInteraction.cs    # 입력: 포인터 호버 + 사용 가능 표시
+│   ├── UICardInteraction.cs    # 입력: 포인터 호버 + 사용 가능 표시
+│   └── CardPileView.cs         # 뷰: 더미 1곳의 장수 표기 (뽑을/버린)
 └── (레거시 UI/CardUITest/·CardTest1~4.prefab은 #25에서 제거됨 — 아래 3. 참조)
 ```
 
@@ -144,6 +145,22 @@ Card (루트)                     ← 위치·회전은 이 오브젝트가 소�
 - `SetInteractable(bool)` — 코스트 부족 시 반투명 + 회색 테두리 + 드래그 차단
   ❌ **호출부 없음** — 코스트 시스템이 붙어야 실제로 쓰임
 
+### CardPileView (뷰: 더미 표기) 🟢
+더미 **한 곳**의 장수를 화면에 표기합니다. (기획서 3.2.6)
+`CardHandView`와 마찬가지로 `OnCardMoved`만 구독하며 카드 흐름에는 관여하지 않습니다.
+- `pileType : CardListType` — 표기할 더미. 뽑을/버린 더미는 **오브젝트 2개**에 타입만 다르게 지정
+- `countText : TMP_Text` — `countFormat`(`{0}`)으로 장수 표기
+- `pileBody : GameObject` — 더미가 비면 숨김(카드 뒷면). 지정 안 하면 항상 표시
+  - 오브젝트를 `SetActive(false)`하지 않고 **하위 `Graphic`의 `enabled`만** 끕니다.
+    `countText`를 카드 뒷면의 자식으로 두는 배치가 흔한데, 통째로 끄면 빈 더미에서
+    숫자까지 사라져 아무것도 안 보이기 때문입니다. `countText`와 그 하위는 캐싱에서 제외됩니다.
+- 이 더미가 출발지/도착지인 이동에만 반응 → 무관한 이동엔 갱신하지 않음
+- 구독은 `OnEnable`(모델의 `Start()` 드로우보다 먼저), 초기 표기는 `Start()`에서 `Refresh()`
+- `Count` — 현재 표기 중인 장수 (읽기 전용)
+
+> 배치 팁: 뽑을 더미는 손패 왼쪽, 버린 더미는 오른쪽에 두면 이후 등장/퇴장 연출의
+> 시작·끝점을 각 더미 위치로 잡기 좋습니다. (아래 6-2 후속)
+
 ---
 
 ## 3. 레거시 구조 (`CardUITest/`) — 제거 완료 #25
@@ -201,9 +218,33 @@ CardManager.StartBattle()
 | 드래그 이동(UICardDrag) | 🟡 일부 | 이동 O, **드롭 판정 X** (아래 6-1) |
 | 카드 사용/드롭 판정 | 🔴 미착수 | drop zone·사용/취소 판정 (기획 대기) |
 | 코스트 시스템 | 🔴 미착수 | `SetInteractable` 호출부 없음 |
-| 카드 더미 UI(뽑을/버린 더미) | 🔴 미착수 | 카운트 표시·연출 시작점 (3.2.6) |
+| 카드 더미 UI(뽑을/버린 더미) | 🟡 일부 | 카운트 표기 O(`CardPileView`), **연출 시작·끝점 X** (3.2.6) |
 | 카드 효과 실행 | 🔴 미착수 | (#26) |
 | 레거시 정리(CardUITest/) | 🟢 완료 | (#25) 이식 완료로 제거 |
+
+---
+
+## 5-1. ⚠️ 카드 순환 모델이 두 벌입니다 (정리 필요)
+
+`develop`에 #40(`feature/card-draw`)과 #41(`feature/game-ui`)이 각각 머지되면서
+**덱/손패/버림 순환 로직이 중복 구현**된 상태입니다.
+
+| | `Pneuma.UI.Card.CardManager` | `Pneuma.Card.Management.CardCycleManager` |
+|---|---|---|
+| 위치 | `Assets/Scripts/UI/CardUI/` | `Assets/Scripts/Card/Management/` |
+| 형태 | MonoBehaviour | 순수 C# (`DeckManager`+`HandManager` 조합) |
+| 카드 단위 | `RuntimeCard` (고유 `Id`) | `CardInstance` (`CurrentCost`·운명각인 등 전투 상태) |
+| 뷰 연동 | ✅ `OnCardMoved` 이벤트 | ❌ 이벤트 없음 (카운트 프로퍼티만) |
+| 사용처 | `UITestScene` — `CardHandView`·`CardPileView` | `_TestCardUseController` (테스트 전용) |
+
+둘 다 셔플·재셔플·손패 상한을 각자 구현했습니다. 그리고 **#44 TO-DO에
+"전투용 손패 UI에 드로우 결과 반영"**이 있어, 그대로 진행되면 `CardCycleManager` → 손패 UI
+배선이 하나 더 생겨 `CardHandView`와 충돌합니다.
+
+> **현재 UI 계층(`CardHandView`/`CardPileView`)은 `CardManager` 쪽에 붙어 있습니다.**
+> 어느 쪽을 정본으로 삼을지는 #44 담당자와 합의가 필요합니다. 합쳐야 할 축:
+> `CardInstance`의 전투 상태(코스트 변동·운명각인)와 `RuntimeCard`의 고유 `Id`·이동 이벤트는
+> 서로 배타적이지 않으므로, **한 클래스로 합치고 이동 이벤트를 남기는 방향**이 자연스럽습니다.
 
 ---
 
@@ -213,8 +254,9 @@ CardManager.StartBattle()
 
 1. **드롭 판정 (`UICardDrag.OnEndDrag`)** — 드롭 위치로 카드 사용/취소 판정.
    ⚠️ 기획 대기: 공격 카드 대상 지정 UI, 드롭 존 규칙(기획서 3.3.2 이하 미확정 구간).
-2. **카드 더미 UI** — 뽑을/버린 카드 더미 오브젝트 + 장수 카운트(3.2.6).
-   있으면 드로우·재셔플·증발이 눈에 보이고, 등장/퇴장 연출의 시작·끝점을 더미 위치로 잡을 수 있음.
+2. **카드 더미 UI — 연출 연결** — 장수 카운트는 `CardPileView`로 완료. 남은 것은
+   `UICardAnimator`의 등장/퇴장 시작·끝점을 각 더미 위치로 잡는 것(카드가 뽑을 더미에서
+   날아오고 버린 더미로 날아가는 연출). 현재는 `appearOffsetY`로 아래에서 올라올 뿐임.
 3. **BattleManager 턴 루프 연동 (#34)** — `StartBattle()`/`StartPlayerTurn()` 호출부.
    현재는 `autoStartOnPlay`로 씬 단독 실행만 검증. 실제 전투에선 배틀 흐름이 호출해야 함.
 4. **코스트 시스템** — 코스트 부족 카드에 `UICardInteraction.SetInteractable(false)` 호출.
@@ -223,16 +265,18 @@ CardManager.StartBattle()
 6. **CardType enum 정합성 확인** — 현재 `Attack/Defense/Buff/Debuff/Unique/Skill`.
    기획서 표 기준과 일치하는지(예: Power/Skill 구분) 확인 필요.
 7. **에디터 검증** — `CardManager` 인스펙터 값(`handDrawCount=5`/`maxHandSize=10`/
-   `autoStartOnPlay`)과 `CardHandView`·`CardHandLayout` 씬 배선을 플레이로 확인.
+   `autoStartOnPlay`)과 `CardHandView`·`CardHandLayout`·`CardPileView` 씬 배선을 플레이로 확인.
+8. **카드 순환 모델 통합** — 위 5-1 참조. #44 담당자와 정본 결정 필요.
 
 ---
 
 ## 7. 관련 이슈
 
-- **#39** [Feature] 덱 및 카드 드로우 시스템 구현 — CardManager 셔플·손패 상한·재셔플 (진행 중)
+- **#44** [Feature] 전투 게임 사이클과 카드 드로우 연결 — `CardCycleManager`↔`BattleManager` (위 5-1 충돌 주의)
 - **#34** [Feature] Battle Flow 턴 루프 — `StartBattle`/`StartPlayerTurn` 호출부
 - **#26** [Feature] 인게임 효과 구현 — `SkillGroupID` 기반 효과 실행
 - **#1** [Feature] 인게임 전투 UI
+- ~~**#39** [Feature] 덱 및 카드 드로우 시스템 구현~~ — CLOSED (#40 머지)
 - ~~**#25** [Refactor] 카드 시스템 리팩토링~~ — 레거시 이식·제거 완료
 - ~~**#27** [TODO] 카드 드래그/드롭~~ — CLOSED (드래그 이동 완료, 드롭 판정은 6-1로 이어짐)
 
@@ -249,7 +293,8 @@ CardManager (모델, 이벤트 발행)              ← 완료
    ├─▶ UICardAnimator (등장/호버/퇴장 트윈)  ← 완료
    ├─▶ UICardInteraction (포인터 호버)       ← 완료
    ├─▶ UICardDrag (드래그 이동)              ← 이동 완료, 드롭 판정 남음
-   └─▶ UICardVisual (표기)                   ← 완료
+   ├─▶ UICardVisual (표기)                   ← 완료
+   └─▶ CardPileView (더미 장수 표기)         ← 카운트 완료, 연출 연결 남음
 ```
 
 권장 순서: ~~① 스폰~~ → ~~② 연출~~ → ~~③ 정렬~~ → ~~④ 호버/상호작용~~ → ~~⑤ 레거시 정리(#25)~~
