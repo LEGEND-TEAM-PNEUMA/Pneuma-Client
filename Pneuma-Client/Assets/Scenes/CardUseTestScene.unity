@@ -223,7 +223,6 @@ GameObject:
   m_Component:
   - component: {fileID: 231745288}
   - component: {fileID: 231745287}
-  - component: {fileID: 231745289}
   m_Layer: 0
   m_Name: _TestCardUseController
   m_TagString: Untagged
@@ -263,35 +262,6 @@ MonoBehaviour:
   deckStateText: {fileID: 303831078}
   handStateText: {fileID: 1925301903}
   discardStateText: {fileID: 2073419692}
---- !u!114 &231745289
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 231745286}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6810c04060b4fa0bbc0590cb2a8b8fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startingDeck:
-  - {fileID: 11400000, guid: 3556df4bdeab5d49b900ffe4c05b3609, type: 2}
-  - {fileID: 11400000, guid: dcbfd28eb03b306c4fe76d6d768ee134, type: 2}
-  - {fileID: 11400000, guid: 07e56eb67f315c5e2d795c528a534e0d, type: 2}
-  - {fileID: 11400000, guid: cf6412adf34c61f4e571e3c848fb7c83, type: 2}
-  - {fileID: 11400000, guid: 3b4b935502060250362ee9fb1bf81a16, type: 2}
-  - {fileID: 11400000, guid: 5a014fb58db77cd449936787d136b9bf, type: 2}
-  - {fileID: 11400000, guid: 8043a6fee742e358967bc2b4e89c76cb, type: 2}
-  - {fileID: 11400000, guid: 6b513078a3601a80e828ea765bb1d1e2, type: 2}
-  - {fileID: 11400000, guid: 7e8fd42e84110e6baf5c6afba414c84b, type: 2}
-  - {fileID: 11400000, guid: e19afcee7915a9409a8b502e49421586, type: 2}
-  - {fileID: 11400000, guid: 6ed3e07ea39c2c4e024481a191182608, type: 2}
-  - {fileID: 11400000, guid: b59d16ae1891eab2730fd985e93e4534, type: 2}
-  drawCountPerTurn: 5
-  cardViewPrefab: {fileID: 6228921484428215890, guid: 562988be6540de041b2e7c54c0c42468, type: 3}
-  cardParent: {fileID: 2138083196}
-  targetEnemy: {fileID: 4000000011}
 --- !u!4 &231745288
 Transform:
   m_ObjectHideFlags: 0
@@ -1852,7 +1822,6 @@ MonoBehaviour:
   currentPlayer: {fileID: 4000000001}
   enemies:
   - {fileID: 4000000011}
-  battleCardController: {fileID: 231745289}
 --- !u!4 &4000000022
 Transform:
   m_ObjectHideFlags: 0
