@@ -199,7 +199,36 @@ public class BattleManager : MonoBehaviour
     {
         Debug.Log("[BattleManager] Enemy Turn Started");
 
-        // TODO: EnemyTurnController 또는 EnemyActionController 연결
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            if (enemies[i] == null || enemies[i].IsDead)
+            {
+                continue;
+            }
+
+            enemies[i].OnEnemyTurnStarted();
+        }
+
+        if (CurrentState == BattleState.EnemyTurn)
+        {
+            ChangeState(BattleState.PlayerTurn);
+        }
+    }
+
+    public void EndPlayerTurn()
+    {
+        if (CurrentState != BattleState.PlayerTurn)
+        {
+            Debug.LogWarning($"[BattleManager] 플레이어 턴이 아니므로 턴을 종료할 수 없습니다: {CurrentState}");
+            return;
+        }
+
+        if (battleCardController != null)
+        {
+            battleCardController.DiscardHand();
+        }
+
+        ChangeState(BattleState.EnemyTurn);
     }
 
     private void EnterVictory()

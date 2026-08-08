@@ -257,6 +257,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6ed3e07ea39c2c4e024481a191182608, type: 2}
   - {fileID: 11400000, guid: b59d16ae1891eab2730fd985e93e4534, type: 2}
   drawCount: 5
+  initializeOnStart: 0
   cardViewPrefab: {fileID: 6228921484428215890, guid: 562988be6540de041b2e7c54c0c42468, type: 3}
   cardParent: {fileID: 2138083196}
   testEnemy: {fileID: 4000000011}
@@ -292,6 +293,9 @@ MonoBehaviour:
   cardViewPrefab: {fileID: 6228921484428215890, guid: 562988be6540de041b2e7c54c0c42468, type: 3}
   cardParent: {fileID: 2138083196}
   targetEnemy: {fileID: 4000000011}
+  deckStateText: {fileID: 303831078}
+  handStateText: {fileID: 1925301903}
+  discardStateText: {fileID: 2073419692}
 --- !u!4 &231745288
 Transform:
   m_ObjectHideFlags: 0
@@ -1006,8 +1010,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 231745287}
-        m_TargetAssemblyTypeName: _TestCardUseController, Assembly-CSharp
+      - m_Target: {fileID: 231745289}
+        m_TargetAssemblyTypeName: Pneuma.Card.Management.BattleCardController, Assembly-CSharp
         m_MethodName: DrawCards
         m_Mode: 1
         m_Arguments:
@@ -1931,8 +1935,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 231745287}
-        m_TargetAssemblyTypeName: _TestCardUseController, Assembly-CSharp
+      - m_Target: {fileID: 231745289}
+        m_TargetAssemblyTypeName: Pneuma.Card.Management.BattleCardController, Assembly-CSharp
         m_MethodName: InitializeDeck
         m_Mode: 1
         m_Arguments:
@@ -2151,7 +2155,7 @@ GameObject:
   - component: {fileID: 5000000202}
   - component: {fileID: 5000000201}
   m_Layer: 0
-  m_Name: DiscardHandButton
+  m_Name: EndTurnButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2201,9 +2205,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 231745287}
-        m_TargetAssemblyTypeName: _TestCardUseController, Assembly-CSharp
-        m_MethodName: DiscardHand
+      - m_Target: {fileID: 4000000021}
+        m_TargetAssemblyTypeName: BattleManager, Assembly-CSharp
+        m_MethodName: EndPlayerTurn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2328,7 +2332,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: DISCARD
+  m_text: END TURN
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
