@@ -69,6 +69,7 @@ namespace Pneuma.UI.Card
         /// <summary>
         /// 전투를 시작합니다. 덱을 구성·셔플하고 초기 손패를 뽑습니다. (기획서 3.1.2 / 3.2.1)
         /// </summary>
+        [ContextMenu("테스트/전투 시작 (덱 구성 + 초기 드로우)")]
         public void StartBattle()
         {
             InitializeDeck();
@@ -79,6 +80,7 @@ namespace Pneuma.UI.Card
         /// 플레이어 턴을 시작합니다. 남은 손패를 모두 버리고 새로 뽑습니다. (기획서 3.2.3)
         /// 턴 흐름(BattleManager)이 호출합니다.
         /// </summary>
+        [ContextMenu("테스트/플레이어 턴 시작 (손패 버리고 재드로우)")]
         public void StartPlayerTurn()
         {
             DiscardHand();
@@ -167,6 +169,7 @@ namespace Pneuma.UI.Card
         /// <summary>
         /// 손패 전체를 버림 더미로 보냅니다. (턴 종료·시작 시)
         /// </summary>
+        [ContextMenu("테스트/손패 전체 버리기")]
         public void DiscardHand()
         {
             List<RuntimeCard> handPile = cardListDictionary[CardListType.HAND];
@@ -222,6 +225,34 @@ namespace Pneuma.UI.Card
 
             OnCardMoved?.Invoke(card, from, to);
         }
+
+#if UNITY_EDITOR
+        // 씬에 테스트 버튼이 없어도 인스펙터에서 카드 흐름을 수동으로 돌려보기 위한 훅입니다.
+        // 컴포넌트 헤더 우클릭 → "테스트/..." 메뉴. 플레이 중에도 동작합니다.
+        // 빌드에는 포함되지 않습니다.
+
+        [ContextMenu("테스트/카드 1장 뽑기")]
+        private void EditorDrawOneCard()
+        {
+            // DrawCard는 bool을 반환해 ContextMenu에 직접 걸 수 없으므로 감싸둡니다.
+            DrawCard();
+        }
+
+        [ContextMenu("테스트/더미 상태 로그")]
+        private void EditorLogPileState()
+        {
+            if (cardListDictionary == null)
+            {
+                Debug.Log("[CardManager] 아직 초기화 전입니다. (플레이 중에만 상태가 있습니다)");
+                return;
+            }
+
+            Debug.Log(
+                $"[CardManager] 뽑을 {cardListDictionary[CardListType.DRAW].Count}장 · " +
+                $"손패 {cardListDictionary[CardListType.HAND].Count}장 · " +
+                $"버림 {cardListDictionary[CardListType.DISCARD].Count}장");
+        }
+#endif
     }
 
 }
