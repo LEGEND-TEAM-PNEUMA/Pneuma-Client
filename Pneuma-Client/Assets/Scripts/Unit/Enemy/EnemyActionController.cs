@@ -10,7 +10,7 @@ public class EnemyActionController : MonoBehaviour
     [SerializeField] private EnemyBehaviorData behaviorData;
     [SerializeField] private EnemyActionExecutor actionExecutor;
 
-    private readonly List<EnemyActionRuntime> runtimeActions = new();
+    protected readonly List<EnemyActionRuntime> runtimeActions = new();
 
     public EnemyActionRuntime PredictedAction { get; private set; }
 
@@ -108,7 +108,62 @@ public class EnemyActionController : MonoBehaviour
         if (fixedAction != null)
             return fixedAction;
 
+        // 몬스터별 특수 우선순위 규칙(예: 시계토끼의 "취약 다음 공격").
+        // 기본 구현은 아무 규칙도 강제하지 않는다.
+        EnemyActionRuntime forcedFollowUpAction =
+            FindForcedFollowUpAction(targetTurn, currentPhase);
+
+        if (forcedFollowUpAction != null)
+            return forcedFollowUpAction;
+
         return SelectRandomAction(targetTurn, currentPhase);
+    }
+
+    /// <summary>
+    /// 몬스터별로 특정 조건에서 행동을 강제하고 싶을 때 하위 클래스에서 재정의한다.
+    /// 기본 구현은 항상 null을 반환해 아무 것도 강제하지 않는다(FixedTurn/RandomPool만 사용).
+    /// FixedTurn보다는 우선순위가 낮게 호출되므로, 재정의하더라도 턴 고정 행동을 덮어쓰지 않는다.
+    /// </summary>
+    protected virtual EnemyActionRuntime FindForcedFollowUpAction(
+        int targetTurn,
+        int currentPhase)
+    {
+        return null;
+    }
+
+    protected EnemyActionRuntime FindActionUsedAtTurn(int turn)
+    {
+        foreach (EnemyActionRuntime action in runtimeActions)
+        {
+            if (action.LastUsedTurn == turn)
+                return action;
+        }
+
+        return null;
+    }
+
+    protected EnemyActionRuntime FindRandomPoolAttack(
+        int targetTurn,
+        int currentPhase)
+    {
+        foreach (EnemyActionRuntime action in runtimeActions)
+        {
+            if (action.Data.SelectionType !=
+                EnemyActionSelectionType.RandomPool)
+            {
+                continue;
+            }
+
+            if (action.Data.ActionType != EnemyActionType.Attack)
+                continue;
+
+            if (!action.IsAvailable(targetTurn, currentPhase))
+                continue;
+
+            return action;
+        }
+
+        return null;
     }
 
     private EnemyActionRuntime FindFixedAction(

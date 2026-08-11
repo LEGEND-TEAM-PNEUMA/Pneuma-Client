@@ -107,5 +107,24 @@ namespace Pneuma.Unit
             CurrentShield = 0;
             OnShieldChanged?.Invoke(CurrentShield);
         }
+
+        /// <summary>
+        /// 데미지 계산 없이 즉시 사망 처리한다.
+        /// 도주 등 데미지가 아닌 사유로 전투 이탈을 표현할 때 사용한다.
+        /// </summary>
+        public void Kill()
+        {
+            if (IsDead) return;
+
+            CurrentShield = 0;
+            CurrentHp = 0;
+
+            OnShieldChanged?.Invoke(CurrentShield);
+            OnHpChanged?.Invoke(CurrentHp, maxHp);
+
+            Debug.Log($"{name} Kill 처리");
+
+            OnDeath?.Invoke(this);
+        }
     }
 }
