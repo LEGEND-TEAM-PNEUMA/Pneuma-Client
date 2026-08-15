@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4aa586f582be9e47b7db8276056e372, type: 3}
+  m_Name: _ClockRabbitBehaviorData
+  m_EditorClassIdentifier: 
+  actions:
+  - actionName: "\uACF5\uACA9"
+    actionType: 0
+    skillGroupId: 200001
+    selectionType: 0
+    fixedTurn: 0
+    phase: 1
+    minAppearTurn: 1
+    maxAppearCount: 0
+    cooldownTurns: 0
+  - actionName: "\uACF5\uACA9\uB825 \uAC15\uD654"
+    actionType: 2
+    skillGroupId: 200002
+    selectionType: 0
+    fixedTurn: 0
+    phase: 1
+    minAppearTurn: 2
+    maxAppearCount: 0
+    cooldownTurns: 1
+  - actionName: "\uCDE8\uC57D"
+    actionType: 3
+    skillGroupId: 200003
+    selectionType: 0
+    fixedTurn: 0
+    phase: 1
+    minAppearTurn: 2
+    maxAppearCount: 0
+    cooldownTurns: 2
+  - actionName: "\uB3C4\uC8FC"
+    actionType: 4
+    skillGroupId: 200004
+    selectionType: 1
+    fixedTurn: 8
+    phase: 1
+    minAppearTurn: 8
+    maxAppearCount: 1
+    cooldownTurns: 0
+  - actionName: "\uACE0\uC815 \uACF5\uACA9"
+    actionType: 0
+    skillGroupId: 200005
+    selectionType: 1
+    fixedTurn: 7
+    phase: 1
+    minAppearTurn: 7
+    maxAppearCount: 1
+    cooldownTurns: 0
