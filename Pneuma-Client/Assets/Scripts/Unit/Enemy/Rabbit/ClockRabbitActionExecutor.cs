@@ -44,7 +44,26 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
             yield break;
         }
 
-        animationController?.PlayAttack();
+        switch (actionData.ActionType)
+        {
+            case EnemyActionType.Attack:
+                animationController?.PlayAttack();
+                break;
+
+            case EnemyActionType.Buff:
+                // 공격력 강화는 별도 애니메이션을 사용하지 않는다.
+                break;
+
+            case EnemyActionType.Debuff:
+                // 시계토끼의 취약 부여 행동은 공격 애니메이션을 사용한다.
+                animationController?.PlayAttack();
+                break;
+
+            case EnemyActionType.Unique:
+                // 시계토끼의 Unique 행동은 현재 도주만 존재한다.
+                animationController?.PlayRun();
+                break;
+        }
 
         if (actionDelay > 0f)
         {
@@ -61,11 +80,7 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
         // SkillGroup 실행 시스템이 연결되면
         // actionData.SkillGroupId를 전달하여 실제 효과를 실행한다.
 
-        // 도주(Unique) 처리: 보상 없는 승리로 취급하기 위해
-        // 즉시 사망 처리해서 BattleManager의 기존 승리 판정(전멸)을 그대로 태운다.
-        // 시계토끼는 Unique 타입 행동이 도주 하나뿐이라는 전제로 작성됨.
-        // 이후 상태이상/소환 등 다른 Unique 행동이 추가되면
-        // SkillGroupId 등으로 조건을 더 구체화해야 한다.
+        // 현재 도주 처리 방식은 다음 커밋에서 별도로 수정한다.
         if (actionData.ActionType == EnemyActionType.Unique)
         {
             Debug.Log(
