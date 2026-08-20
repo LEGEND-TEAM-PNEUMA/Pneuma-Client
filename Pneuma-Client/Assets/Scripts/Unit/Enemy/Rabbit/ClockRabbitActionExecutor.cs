@@ -12,6 +12,11 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
     [SerializeField, Min(0f)]
     private float actionDelay = 0.5f;
 
+    // 런타임 공격력 보너스
+    private int attackPowerBonus;
+
+    public int AttackPowerBonus => attackPowerBonus;
+
     private void Awake()
     {
         if (animationController == null)
@@ -51,7 +56,11 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
                 break;
 
             case EnemyActionType.Buff:
+                attackPowerBonus++;
                 // 공격력 강화는 별도 애니메이션을 사용하지 않는다.
+                Debug.Log(
+                    $"[ClockRabbitActionExecutor] {source.EnemyName} 공격력 강화 " +
+                    $"+1 (현재 누적: +{attackPowerBonus})");
                 break;
 
             case EnemyActionType.Debuff:
