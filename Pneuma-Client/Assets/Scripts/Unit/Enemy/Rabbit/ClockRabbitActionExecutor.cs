@@ -12,6 +12,10 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
     [SerializeField, Min(0f)]
     private float actionDelay = 0.5f;
 
+    [SerializeField, Min(0)]
+    private int baseAttackDamage = 3;
+
+
     // 런타임 공격력 보너스
     private int attackPowerBonus;
 
@@ -31,6 +35,8 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
         Player target,
         EnemyActionData actionData)
     {
+        // 애니메이션 → 대기 → 실제 효과
+
         if (source == null || source.IsDead)
         {
             yield break;
@@ -49,6 +55,7 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
             yield break;
         }
 
+        // 1. 행동 애니메이션
         switch (actionData.ActionType)
         {
             case EnemyActionType.Attack:
@@ -74,6 +81,7 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
                 break;
         }
 
+        // 2. 행동 지연
         if (actionDelay > 0f)
         {
             yield return new WaitForSeconds(actionDelay);
@@ -85,18 +93,41 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
             $"{actionData.ActionName}, " +
             $"SkillGroupId: {actionData.SkillGroupId}");
 
-        // TODO:
-        // SkillGroup 실행 시스템이 연결되면
-        // actionData.SkillGroupId를 전달하여 실제 효과를 실행한다.
-
-        // 현재 도주 처리 방식은 다음 커밋에서 별도로 수정한다.
-        if (actionData.ActionType == EnemyActionType.Unique)
+         // 2. 실제 행동 효과
+        switch (actionData.ActionType)
         {
-            Debug.Log(
-                $"[ClockRabbitActionExecutor] {source.EnemyName} 도주 - " +
-                "보상 없는 승리 처리를 위해 즉시 사망 처리합니다.");
+            case EnemyActionType.Attack:
+            {
+                int finalDamage =
+                    baseAttackDamage + attackPowerBonus;
 
-            source.Kill();
+                target.TakeDamage(finalDamage);
+
+                Debug.Log(
+                    $"[ClockRabbitActionExecutor] {source.EnemyName} 공격: " +
+                    $"{baseAttackDamage} + 강화 {attackPowerBonus} " +
+                    $"= {finalDamage} 피해");
+
+                break;
+            }
+
+            case EnemyActionType.Buff:
+                attackPowerBonus++;
+
+                Debug.Log(
+                    $"[ClockRabbitActionExecutor] {source.EnemyName} 공격력 강화 " +
+                    $"+1 (현재 누적: +{attackPowerBonus})");
+
+                break;
+
+            case EnemyActionType.Debuff:
+                // 다음 커밋에서 취약 적용
+                break;
+
+            case EnemyActionType.Unique:
+                // 아직 기존 임시 도주 처리 유지
+                source.Kill();
+                break;
         }
     }
 }
