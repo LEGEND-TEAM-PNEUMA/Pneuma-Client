@@ -1,20 +1,55 @@
-﻿using UnityEngine;
+﻿using Pneuma.Unit;
+using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(Enemy))]
 public class RabbitAnimationController : MonoBehaviour
 {
-    private static readonly int IdleHash = Animator.StringToHash("Idle");
-    private static readonly int AttackHash = Animator.StringToHash("Attack");
-    private static readonly int HitHash = Animator.StringToHash("Hit");
-    private static readonly int DefeatHash = Animator.StringToHash("Defeat");
-    private static readonly int RunHash = Animator.StringToHash("Run");
+    private static readonly int IdleHash =
+        Animator.StringToHash("Idle");
+
+    private static readonly int AttackHash =
+        Animator.StringToHash("Attack");
+
+    private static readonly int HitHash =
+        Animator.StringToHash("Hit");
+
+    private static readonly int DefeatHash =
+        Animator.StringToHash("Defeat");
+
+    private static readonly int RunHash =
+        Animator.StringToHash("Run");
 
     private Animator animator;
+    private Enemy enemy;
+
     private bool isDefeated;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        enemy = GetComponent<Enemy>();
+    }
+
+    private void OnEnable()
+    {
+        if (enemy != null)
+        {
+            enemy.OnDeath += HandleDeath;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (enemy != null)
+        {
+            enemy.OnDeath -= HandleDeath;
+        }
+    }
+
+    private void HandleDeath(CharacterBase deadUnit)
+    {
+        PlayDefeat();
     }
 
     public void PlayAttack()
@@ -48,6 +83,8 @@ public class RabbitAnimationController : MonoBehaviour
 
         animator.ResetTrigger(AttackHash);
         animator.ResetTrigger(HitHash);
+        animator.ResetTrigger(RunHash);
+
         animator.SetTrigger(DefeatHash);
     }
 
