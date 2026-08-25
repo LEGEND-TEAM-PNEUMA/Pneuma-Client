@@ -121,7 +121,11 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
                 break;
 
             case EnemyActionType.Debuff:
-                // 다음 커밋에서 취약 적용
+                target.ApplyVulnerable();
+
+                Debug.Log(
+                    $"[ClockRabbitActionExecutor] " +
+                    $"{target.CharacterName}에게 취약 부여");
                 break;
 
             case EnemyActionType.Unique:

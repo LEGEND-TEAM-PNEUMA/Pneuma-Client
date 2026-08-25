@@ -33,7 +33,7 @@ namespace Pneuma.Unit
             OnShieldChanged?.Invoke(CurrentShield);
         }
 
-        public void TakeDamage(int damage)
+        public virtual void TakeDamage(int damage)
         {
             if (damage <= 0 || IsDead) return;
 
