@@ -17,6 +17,7 @@ namespace Pneuma.Unit
         public event Action<int, int> OnHpChanged; // (current, max)
         public event Action<int> OnShieldChanged;
         public event Action<CharacterBase> OnDeath;
+        public event Action<CharacterBase> OnDamaged;
 
         protected virtual void Awake()
         {
@@ -57,6 +58,8 @@ namespace Pneuma.Unit
 
             Debug.Log("TakeDamage: " + damage);
             Debug.Log("CurrentHp: " + CurrentHp);
+
+            OnDamaged?.Invoke(this);
 
             if (wasAlive && IsDead)
             {

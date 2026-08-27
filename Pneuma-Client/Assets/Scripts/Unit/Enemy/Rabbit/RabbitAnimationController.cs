@@ -38,6 +38,7 @@ public class RabbitAnimationController : MonoBehaviour
     {
         if (enemy != null)
         {
+            enemy.OnDamaged += HandleDamaged;
             enemy.OnDeath += HandleDeath;
         }
     }
@@ -46,6 +47,7 @@ public class RabbitAnimationController : MonoBehaviour
     {
         if (enemy != null)
         {
+            enemy.OnDamaged -= HandleDamaged;
             enemy.OnDeath -= HandleDeath;
         }
     }
@@ -152,5 +154,15 @@ public class RabbitAnimationController : MonoBehaviour
         animator.ResetTrigger(RunHash);
 
         animator.Play(IdleHash, 0, 0f);
+    }
+
+    private void HandleDamaged(CharacterBase damagedUnit)
+    {
+        if (enemy.IsDead)
+        {
+            return;
+        }
+
+        PlayHit();
     }
 }
