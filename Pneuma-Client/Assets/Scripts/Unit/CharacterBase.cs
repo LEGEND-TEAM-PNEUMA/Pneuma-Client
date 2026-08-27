@@ -113,7 +113,8 @@ namespace Pneuma.Unit
 
         /// <summary>
         /// 데미지 계산 없이 즉시 사망 처리한다.
-        /// 도주 등 데미지가 아닌 사유로 전투 이탈을 표현할 때 사용한다.
+        /// HP를 0으로 만들고 OnDeath 이벤트를 발생시킨다.
+        /// 도주와 같은 전투 이탈에는 사용하지 않는다.
         /// </summary>
         public void Kill()
         {
