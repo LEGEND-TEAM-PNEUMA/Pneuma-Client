@@ -92,6 +92,7 @@ public class BattleManager : MonoBehaviour
 
         enemies.Add(enemy);
         enemy.OnDeath += HandleEnemyDeath; // Enemy의 OnDeath 이벤트 구독 : 죽었을 때 BattleManager가 처리하도록 연결
+        enemy.OnEscaped += HandleEnemyEscape;
 
         Debug.Log($"[BattleManager] Enemy Registered: {enemy.name}");
     }
@@ -102,6 +103,7 @@ public class BattleManager : MonoBehaviour
             return;
 
         enemy.OnDeath -= HandleEnemyDeath;
+        enemy.OnEscaped -= HandleEnemyEscape;
         enemies.Remove(enemy);
 
         Debug.Log($"[BattleManager] Enemy Unregistered: {enemy.name}");
@@ -120,6 +122,7 @@ public class BattleManager : MonoBehaviour
                 continue;
 
             enemy.OnDeath -= HandleEnemyDeath;
+            enemy.OnEscaped -= HandleEnemyEscape;
         }
     }
 
@@ -158,6 +161,9 @@ public class BattleManager : MonoBehaviour
 
             case BattleState.Defeat:
                 EnterDefeat();
+                break;
+            case BattleState.Escape:
+                EnterEscape();
                 break;
         }
     }
@@ -236,6 +242,12 @@ public class BattleManager : MonoBehaviour
         Debug.Log("[BattleManager] Defeat");
     }
 
+    private void EnterEscape()
+    {
+        Debug.Log(
+            "[BattleManager] Enemy Escaped - Battle End");
+    }
+
     public void IncreaseTurn()
     {
         CurrentTurn++;
@@ -289,6 +301,19 @@ public class BattleManager : MonoBehaviour
 
             enemy.PredictAction(targetTurn);
         }
+    }
+
+    private void HandleEnemyEscape(Enemy escapedEnemy)
+    {
+        if (escapedEnemy == null)
+            return;
+
+        Debug.Log(
+            $"[BattleManager] Enemy Escaped: {escapedEnemy.name}");
+
+        UnregisterEnemy(escapedEnemy);
+
+        ChangeState(BattleState.Escape);
     }
 
     /// 현재 살아 있는 적들이 미리 예견한 행동을 순서대로 실행한다.

@@ -35,8 +35,6 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
         Player target,
         EnemyActionData actionData)
     {
-        // 애니메이션 → 대기 → 실제 효과
-
         if (source == null || source.IsDead)
         {
             yield break;
@@ -55,6 +53,25 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
             yield break;
         }
 
+        // 도주는 별도 처리
+        if (actionData.ActionType == EnemyActionType.Unique)
+        {
+            Debug.Log(
+                $"[ClockRabbitActionExecutor] {source.EnemyName} 도주 시작");
+
+            if (animationController != null)
+            {
+                yield return animationController.PlayRunAndExit();
+            }
+
+            if (!source.IsDead)
+            {
+                source.Escape();
+            }
+
+            yield break;
+        }
+
         // 1. 행동 애니메이션
         switch (actionData.ActionType)
         {
@@ -63,21 +80,11 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
                 break;
 
             case EnemyActionType.Buff:
-                attackPowerBonus++;
-                // 공격력 강화는 별도 애니메이션을 사용하지 않는다.
-                Debug.Log(
-                    $"[ClockRabbitActionExecutor] {source.EnemyName} 공격력 강화 " +
-                    $"+1 (현재 누적: +{attackPowerBonus})");
+                // 공격력 강화는 별도 애니메이션 없음
                 break;
 
             case EnemyActionType.Debuff:
-                // 시계토끼의 취약 부여 행동은 공격 애니메이션을 사용한다.
                 animationController?.PlayAttack();
-                break;
-
-            case EnemyActionType.Unique:
-                // 시계토끼의 Unique 행동은 현재 도주만 존재한다.
-                animationController?.PlayRun();
                 break;
         }
 
@@ -87,13 +94,7 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
             yield return new WaitForSeconds(actionDelay);
         }
 
-        Debug.Log(
-            $"[ClockRabbitActionExecutor] " +
-            $"{source.EnemyName} 행동 실행: " +
-            $"{actionData.ActionName}, " +
-            $"SkillGroupId: {actionData.SkillGroupId}");
-
-         // 2. 실제 행동 효과
+        // 3. 실제 행동 효과
         switch (actionData.ActionType)
         {
             case EnemyActionType.Attack:
@@ -126,12 +127,14 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
                 Debug.Log(
                     $"[ClockRabbitActionExecutor] " +
                     $"{target.CharacterName}에게 취약 부여");
-                break;
 
-            case EnemyActionType.Unique:
-                // 아직 기존 임시 도주 처리 유지
-                source.Kill();
                 break;
         }
+
+        Debug.Log(
+            $"[ClockRabbitActionExecutor] " +
+            $"{source.EnemyName} 행동 실행: " +
+            $"{actionData.ActionName}, " +
+            $"SkillGroupId: {actionData.SkillGroupId}");
     }
 }

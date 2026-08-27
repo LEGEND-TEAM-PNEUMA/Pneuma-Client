@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using System;
 
 namespace Pneuma.Unit
 {
@@ -15,6 +16,10 @@ namespace Pneuma.Unit
         
         [Header("Enemy Action")]
         [SerializeField] private EnemyActionController actionController;
+
+        public bool IsEscaped { get; private set; }
+
+        public event Action<Enemy> OnEscaped;
 
         public EnemyData EnemyData => enemyData;
 
@@ -59,7 +64,7 @@ namespace Pneuma.Unit
         /// </summary>
         public void PredictAction(int targetTurn)
         {
-            if (IsDead)
+            if (IsDead || IsEscaped)
                 return;
 
             if (actionController == null)
@@ -79,7 +84,7 @@ namespace Pneuma.Unit
             int currentTurn,
             Player target)
         {
-            if (IsDead)
+            if (IsDead || IsEscaped)
                 yield break;
 
             if (target == null || target.IsDead)
@@ -116,5 +121,18 @@ namespace Pneuma.Unit
         }
 
         // OnEnemyTurnStarted 메서드 제거 : 역할 분리 
+
+        public void Escape()
+        {
+            if (IsDead || IsEscaped)
+                return;
+
+            IsEscaped = true;
+
+            Debug.Log(
+                $"[Enemy] {EnemyName} escaped.");
+
+            OnEscaped?.Invoke(this);
+        }
     }
 }
