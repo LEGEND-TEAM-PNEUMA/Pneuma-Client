@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 5081128440143794547}
   - component: {fileID: 1128563407979265854}
   - component: {fileID: 8582613337018055298}
+  - component: {fileID: -3510245762261574871}
+  - component: {fileID: -5900099511125909022}
   m_Layer: 0
   m_Name: Rabbit
   m_TagString: Untagged
@@ -138,3 +140,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHp: 100
   enemyData: {fileID: 11400000, guid: a6404b9d6427cb74596a32e8155df872, type: 2}
+  actionController: {fileID: -5900099511125909022}
+--- !u!114 &-3510245762261574871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5481774355668416825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b00922c79ced6d4797ef687c04e7d39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animationController: {fileID: 1128563407979265854}
+  actionDelay: 0.5
+--- !u!114 &-5900099511125909022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5481774355668416825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b8868435f08d344c89f17eac175915a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  owner: {fileID: 8582613337018055298}
+  behaviorData: {fileID: 11400000, guid: 820f68e1f9cecb845ad22becea1e42d0, type: 2}
+  actionExecutor: {fileID: -3510245762261574871}
