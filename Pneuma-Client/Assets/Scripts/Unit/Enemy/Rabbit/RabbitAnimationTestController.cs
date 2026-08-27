@@ -24,4 +24,9 @@ public class RabbitAnimationTestController : MonoBehaviour
     {
         rabbitAnimation.PlayDefeat();
     }
+
+    public void PlayRun()
+    {
+        rabbitAnimation.PlayRun();
+    }
 }
