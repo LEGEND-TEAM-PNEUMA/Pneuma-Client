@@ -56,23 +56,33 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
         // 도주는 별도 처리
         if (actionData.ActionType == EnemyActionType.Unique)
         {
-            Debug.Log(
-                $"[ClockRabbitActionExecutor] {source.EnemyName} 도주 시작");
-
-            if (animationController != null)
-            {
-                yield return animationController.PlayRunAndExit();
-            }
-
-            if (!source.IsDead)
-            {
-                source.Escape();
-            }
-
+            yield return ExecuteEscape(source);
             yield break;
         }
 
-        // 1. 행동 애니메이션
+        PlayActionAnimation(actionData);
+
+        if (actionDelay > 0f)
+        {
+            yield return new WaitForSeconds(actionDelay);
+        }
+
+        ApplyActionEffect(
+            source,
+            target,
+            actionData);
+
+        Debug.Log(
+            $"[ClockRabbitActionExecutor] " +
+            $"{source.EnemyName} 행동 실행: " +
+            $"{actionData.ActionName}, " +
+            $"SkillGroupId: {actionData.SkillGroupId}");
+    }
+
+    // 애니메이션 처리
+    private void PlayActionAnimation(
+    EnemyActionData actionData)
+    {
         switch (actionData.ActionType)
         {
             case EnemyActionType.Attack:
@@ -87,54 +97,80 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
                 animationController?.PlayAttack();
                 break;
         }
+    }
 
-        // 2. 행동 지연
-        if (actionDelay > 0f)
-        {
-            yield return new WaitForSeconds(actionDelay);
-        }
-
-        // 3. 실제 행동 효과
+    // 실제 효과 처리
+    private void ApplyActionEffect(
+    Enemy source,
+    Player target,
+    EnemyActionData actionData)
+    {
         switch (actionData.ActionType)
         {
             case EnemyActionType.Attack:
-            {
-                int finalDamage =
-                    baseAttackDamage + attackPowerBonus;
-
-                target.TakeDamage(finalDamage);
-
-                Debug.Log(
-                    $"[ClockRabbitActionExecutor] {source.EnemyName} 공격: " +
-                    $"{baseAttackDamage} + 강화 {attackPowerBonus} " +
-                    $"= {finalDamage} 피해");
-
+                ExecuteAttack(source, target);
                 break;
-            }
 
             case EnemyActionType.Buff:
-                attackPowerBonus++;
-
-                Debug.Log(
-                    $"[ClockRabbitActionExecutor] {source.EnemyName} 공격력 강화 " +
-                    $"+1 (현재 누적: +{attackPowerBonus})");
-
+                ExecuteAttackBuff(source);
                 break;
 
             case EnemyActionType.Debuff:
-                target.ApplyVulnerable();
-
-                Debug.Log(
-                    $"[ClockRabbitActionExecutor] " +
-                    $"{target.CharacterName}에게 취약 부여");
-
+                ExecuteVulnerable(source, target);
                 break;
         }
+    }
+
+    private void ExecuteAttack(
+    Enemy source,
+    Player target)
+    {
+        int finalDamage =
+            baseAttackDamage + attackPowerBonus;
+
+        target.TakeDamage(finalDamage);
+
+        Debug.Log(
+            $"[ClockRabbitActionExecutor] {source.EnemyName} 공격: " +
+            $"{baseAttackDamage} + 강화 {attackPowerBonus} " +
+            $"= {finalDamage} 피해");
+    }
+
+    private void ExecuteAttackBuff(Enemy source)
+    {
+        attackPowerBonus++;
+
+        Debug.Log(
+            $"[ClockRabbitActionExecutor] {source.EnemyName} 공격력 강화 " +
+            $"+1 (현재 누적: +{attackPowerBonus})");
+    }
+
+    private void ExecuteVulnerable(
+    Enemy source,
+    Player target)
+    {
+        target.ApplyVulnerable();
 
         Debug.Log(
             $"[ClockRabbitActionExecutor] " +
-            $"{source.EnemyName} 행동 실행: " +
-            $"{actionData.ActionName}, " +
-            $"SkillGroupId: {actionData.SkillGroupId}");
+            $"{source.EnemyName}이 " +
+            $"{target.CharacterName}에게 취약 부여");
+    }
+
+    private IEnumerator ExecuteEscape(Enemy source)
+    {
+        Debug.Log(
+            $"[ClockRabbitActionExecutor] " +
+            $"{source.EnemyName} 도주 시작");
+
+        if (animationController != null)
+        {
+            yield return animationController.PlayRunAndExit();
+        }
+
+        if (!source.IsDead)
+        {
+            source.Escape();
+        }
     }
 }
