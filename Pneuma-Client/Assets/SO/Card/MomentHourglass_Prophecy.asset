@@ -12,13 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014281e33f2f4a1f8d98a4de38863341, type: 3}
   m_Name: MomentHourglass_Prophecy
   m_EditorClassIdentifier: 
-  cardName: "\uCC30\uB098\uC758 \uBAA8\uB798\uC2DC\uACC4(\uC608\uC5B8)"
+  cardName: "찰나의 모래시계(예언)"
   cardType: 5
   cardRarity: 0
   cardCharacter: CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)
   cardCost: 0
-  cardSkills: []
-  cardMaxCount: 0
+  cardSkills:
+  - skillType: 6
+    value: 1
+    hitCount: 1
+    target: 1
+    targetCount: 1
+    statusEffectDuration: 0
+    createdCard: {fileID: 0}
+    summonGroupId: 
+  - skillType: 3
+    value: 1
+    hitCount: 1
+    target: 1
+    targetCount: 1
+    statusEffectDuration: 0
+    createdCard: {fileID: 0}
+    summonGroupId: 
+  cardMaxCount: 5
   cardOncePerTurn: 0
   cardExhausts: 0
   cardCanProphecy: 0
@@ -29,4 +45,4 @@ MonoBehaviour:
   cardHasCutscene: 0
   cardCutsceneSound: {fileID: 0}
   cardIllust: {fileID: 0}
-  cardDescription: 
+  cardDescription: "에너지를 1회복한다. 예언 : 에너지를 1회복하고, 카드 1장을 드로우한다. 소멸"

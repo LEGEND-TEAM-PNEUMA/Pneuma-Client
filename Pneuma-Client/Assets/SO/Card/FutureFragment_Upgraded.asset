@@ -10,23 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 014281e33f2f4a1f8d98a4de38863341, type: 3}
-  m_Name: FutureResonance_Prophecy
+  m_Name: FutureFragment_Upgraded
   m_EditorClassIdentifier: 
-  cardName: "\uBBF8\uB798\uC758 \uC794\uD5A5(\uC608\uC5B8)"
+  cardName: "미래의 파편+"
   cardType: 5
   cardRarity: 0
   cardCharacter: CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)
   cardCost: 0
-  cardSkills: []
-  cardMaxCount: 0
+  cardSkills:
+  - skillType: 0
+    value: 5
+    hitCount: 1
+    target: 3
+    targetCount: 1
+    statusEffectDuration: 0
+    createdCard: {fileID: 0}
+    summonGroupId: 
+  cardMaxCount: 5
   cardOncePerTurn: 0
-  cardExhausts: 0
-  cardCanProphecy: 0
-  cardIsProphecy: 0
-  cardIsUpgraded: 0
-  cardUpgradeTarget: {fileID: 11400000, guid: 251ec143a39e438cb4ae17d06fe9f5cc, type: 2}
-  cardUpgradedFrom: {fileID: 0}
+  cardExhausts: 1
+  cardCanProphecy: 1
+  cardIsProphecy: 1
+  cardIsUpgraded: 1
+  cardUpgradeTarget: {fileID: 0}
+  cardUpgradedFrom: {fileID: 11400000, guid: 8043a6fee742e358967bc2b4e89c76cb, type: 2}
   cardHasCutscene: 0
   cardCutsceneSound: {fileID: 0}
   cardIllust: {fileID: 0}
-  cardDescription: 
+  cardDescription: "예언 전용 카드 예언 : 랜덤적에게 5의 피해를 입힌다."

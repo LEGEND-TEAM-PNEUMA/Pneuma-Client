@@ -9,5 +9,7 @@ public enum SkillTargetType
     [InspectorName("자신")] Self,
     [InspectorName("적")] Enemy,
     [InspectorName("랜덤 적")] RandomEnemy,
-    [InspectorName("모든 적")] AllEnemy
+    [InspectorName("모든 적")] AllEnemy,
+    [InspectorName("핸드")] Hand,
+    [InspectorName("플레이어")] Player
 }
