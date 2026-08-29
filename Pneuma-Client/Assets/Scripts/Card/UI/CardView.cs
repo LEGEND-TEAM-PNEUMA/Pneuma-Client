@@ -41,8 +41,18 @@ public class CardView : MonoBehaviour
     public void Bind(CardInstance card)
     {
         BoundCard = card;
-        button.interactable = card != null;
+        SetInteractable(card != null);
         Refresh();
+    }
+
+    public void SetInteractable(bool value)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        button.interactable = value && BoundCard != null;
     }
 
     public void Refresh()

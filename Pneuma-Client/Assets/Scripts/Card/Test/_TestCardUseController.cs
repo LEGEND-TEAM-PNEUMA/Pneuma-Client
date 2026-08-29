@@ -11,6 +11,7 @@ public class _TestCardUseController : MonoBehaviour
     [Header("Deck")]
     [SerializeField] private List<CardData> testDeck = new List<CardData>();
     [SerializeField, Min(1)] private int drawCount = 5;
+    [SerializeField] private bool initializeOnStart = true;
 
     [Header("Card View")]
     [SerializeField] private CardView cardViewPrefab;
@@ -28,7 +29,10 @@ public class _TestCardUseController : MonoBehaviour
 
     private void Start()
     {
-        InitializeDeck();
+        if (initializeOnStart)
+        {
+            InitializeDeck();
+        }
     }
 
     public void InitializeDeck()

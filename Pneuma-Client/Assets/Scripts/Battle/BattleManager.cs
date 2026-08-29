@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Battle;
+using Pneuma.Card.Management;
 using Pneuma.Unit;
 using System.Collections;
 
@@ -12,6 +13,9 @@ public class BattleManager : MonoBehaviour
     [Header("Battle Units")]
     [SerializeField] private Player currentPlayer;
     [SerializeField] private List<Enemy> enemies = new(); // enemy 리스트 연결
+
+    [Header("Card")]
+    [SerializeField] private BattleCardController battleCardController;
 
     public Player CurrentPlayer => currentPlayer;
     public IReadOnlyList<Enemy> Enemies => enemies;
@@ -169,6 +173,11 @@ public class BattleManager : MonoBehaviour
         PredictEnemyActions(firstTurn);
 
         // 배틀 인트로 UI, 배경 음악 재생 등 초기화 작업 수행
+
+        if (battleCardController != null)
+        {
+            battleCardController.InitializeBattleDeck();
+        }
     }
 
     private void EnterPlayerTurn() // 플레이어 턴 시작 : 턴 횟수 증가, 드로우
@@ -185,8 +194,10 @@ public class BattleManager : MonoBehaviour
 
         Debug.Log($"[BattleManager] Player Turn Started. Turn: {CurrentTurn}");
 
-        // TODO: 덱 매니저 연결 후 매 턴 드로우 처리
-        // deckManager.DrawForTurn();
+        if (battleCardController != null)
+        {
+            battleCardController.DrawForPlayerTurn();
+        }
     }
 
     /// 플레이어의 턴 종료 요청을 받아 EnemyTurn으로 전환한다.
@@ -207,6 +218,11 @@ public class BattleManager : MonoBehaviour
                 $"CurrentState: {CurrentState}");
 
             return;
+        }
+
+        if (battleCardController != null)
+        {
+            battleCardController.DiscardHand();
         }
 
         ChangeState(BattleState.EnemyTurn);
