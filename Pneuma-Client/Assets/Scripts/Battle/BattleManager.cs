@@ -96,6 +96,7 @@ public class BattleManager : MonoBehaviour
 
         enemies.Add(enemy);
         enemy.OnDeath += HandleEnemyDeath; // Enemy의 OnDeath 이벤트 구독 : 죽었을 때 BattleManager가 처리하도록 연결
+        enemy.OnEscaped += HandleEnemyEscape;
 
         Debug.Log($"[BattleManager] Enemy Registered: {enemy.name}");
     }
@@ -106,6 +107,7 @@ public class BattleManager : MonoBehaviour
             return;
 
         enemy.OnDeath -= HandleEnemyDeath;
+        enemy.OnEscaped -= HandleEnemyEscape;
         enemies.Remove(enemy);
 
         Debug.Log($"[BattleManager] Enemy Unregistered: {enemy.name}");
@@ -124,16 +126,29 @@ public class BattleManager : MonoBehaviour
                 continue;
 
             enemy.OnDeath -= HandleEnemyDeath;
+            enemy.OnEscaped -= HandleEnemyEscape;
         }
     }
 
     public void ChangeState(BattleState newState)
     {
-        if (CurrentState == newState) return;
+        if (CurrentState == newState)
+            return;
+
+        // 이미 전투가 종료됐다면 다른 상태로 이동하지 않는다.
+        if (IsBattleEnded())
+        {
+            Debug.LogWarning(
+                $"[BattleManager] 전투가 이미 종료되었습니다. " +
+                $"{CurrentState} → {newState} 전환을 무시합니다.");
+
+            return;
+        }
 
         CurrentState = newState;
 
-        Debug.Log($"[BattleManager] State Changed : {CurrentState}");
+        Debug.Log(
+            $"[BattleManager] State Changed : {CurrentState}");
 
         EnterState(CurrentState);
 
@@ -162,6 +177,9 @@ public class BattleManager : MonoBehaviour
 
             case BattleState.Defeat:
                 EnterDefeat();
+                break;
+            case BattleState.Escape:
+                EnterEscape();
                 break;
         }
     }
@@ -203,6 +221,15 @@ public class BattleManager : MonoBehaviour
     /// 플레이어의 턴 종료 요청을 받아 EnemyTurn으로 전환한다.
     public void EndPlayerTurn()
     {
+        if (IsBattleEnded())
+        {
+            Debug.LogWarning(
+                $"[BattleManager] 전투가 종료되어 턴을 진행할 수 없습니다. " +
+                $"State: {CurrentState}");
+
+            return;
+        }
+
         if (!isBattleStarted)
         {
             Debug.LogWarning(
@@ -252,6 +279,12 @@ public class BattleManager : MonoBehaviour
         Debug.Log("[BattleManager] Defeat");
     }
 
+    private void EnterEscape()
+    {
+        Debug.Log(
+            "[BattleManager] Enemy Escaped - Battle End");
+    }
+
     public void IncreaseTurn()
     {
         CurrentTurn++;
@@ -286,6 +319,14 @@ public class BattleManager : MonoBehaviour
 
     private void Update() // 디버그용 : 킬 코드 K 키를 눌러 첫 번째 적에게 999 데미지
     {
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            if (enemies.Count > 0)
+            {
+                enemies[0].TakeDamage(1);
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.K))
         {
             if (enemies.Count > 0)
@@ -305,6 +346,19 @@ public class BattleManager : MonoBehaviour
 
             enemy.PredictAction(targetTurn);
         }
+    }
+
+    private void HandleEnemyEscape(Enemy escapedEnemy)
+    {
+        if (escapedEnemy == null)
+            return;
+
+        Debug.Log(
+            $"[BattleManager] Enemy Escaped: {escapedEnemy.name}");
+
+        UnregisterEnemy(escapedEnemy);
+
+        ChangeState(BattleState.Escape);
     }
 
     /// 현재 살아 있는 적들이 미리 예견한 행동을 순서대로 실행한다.
@@ -360,6 +414,13 @@ public class BattleManager : MonoBehaviour
 
         ChangeState(BattleState.PlayerTurn);
     }
+
+    private bool IsBattleEnded()
+    {
+        return CurrentState == BattleState.Victory ||
+            CurrentState == BattleState.Defeat ||
+            CurrentState == BattleState.Escape;
+    }   
 
     private void OnDestroy()
     {
