@@ -5,7 +5,7 @@ using UnityEngine;
 public class CardSkillDrawer : PropertyDrawer
 {
     private const float LineSpacing = 2f;
-    private const int LineCount = 4;
+    private const int LineCount = 8;
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
@@ -22,8 +22,12 @@ public class CardSkillDrawer : PropertyDrawer
 
             DrawProperty(ref position, property, "skillType", "스킬 타입");
             DrawProperty(ref position, property, "value", "수치");
+            DrawProperty(ref position, property, "hitCount", "타격 횟수");
             DrawProperty(ref position, property, "target", "대상");
             DrawProperty(ref position, property, "targetCount", "대상 수");
+            DrawProperty(ref position, property, "statusEffectDuration", "상태 지속");
+            DrawProperty(ref position, property, "createdCard", "생성 카드");
+            DrawProperty(ref position, property, "summonGroupId", "소환 그룹");
 
             EditorGUIUtility.labelWidth = previousLabelWidth;
             EditorGUI.indentLevel--;

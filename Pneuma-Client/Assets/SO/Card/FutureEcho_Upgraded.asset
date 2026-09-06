@@ -12,16 +12,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014281e33f2f4a1f8d98a4de38863341, type: 3}
   m_Name: FutureEcho_Upgraded
   m_EditorClassIdentifier: 
-  cardName: "\uBBF8\uB798\uC758 \uBA54\uC544\uB9AC+"
+  cardName: "미래의 메아리+"
   cardType: 0
   cardRarity: 1
   cardCharacter: CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)
   cardCost: 2
-  cardSkills: []
-  cardMaxCount: 0
+  cardSkills:
+  - skillType: 0
+    value: 6
+    hitCount: 1
+    target: 4
+    targetCount: 0
+    statusEffectDuration: 0
+    createdCard: {fileID: 0}
+    summonGroupId: 
+  - skillType: 4
+    value: 1
+    hitCount: 1
+    target: 5
+    targetCount: 1
+    statusEffectDuration: 0
+    createdCard: {fileID: 11400000, guid: 89fc18abff43d0467bc9e3e3ac82e074, type: 2}
+    summonGroupId: 
+  cardMaxCount: 5
   cardOncePerTurn: 0
   cardExhausts: 0
-  cardCanProphecy: 0
+  cardCanProphecy: 1
   cardIsProphecy: 0
   cardIsUpgraded: 1
   cardUpgradeTarget: {fileID: 0}
@@ -29,4 +45,4 @@ MonoBehaviour:
   cardHasCutscene: 0
   cardCutsceneSound: {fileID: 0}
   cardIllust: {fileID: 0}
-  cardDescription: 
+  cardDescription: "적 전체에게 9의 피해를 입히며, 핸드에 미래의 잔향+을 추가한다. 예언 : 적 전체에게 6의 피해를 입히며, 핸드에 미래의 잔향+을 2개 추가한다."
