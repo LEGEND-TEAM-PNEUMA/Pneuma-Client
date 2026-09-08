@@ -1405,8 +1405,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 604c0f46e91b6234385324467cb50e08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainPanel: {fileID: 830529367}
-  SettingPanel: {fileID: 1333419367}
+  settingsOverlay: {fileID: 0}
+  confirmPopup: {fileID: 0}
+  continueButton: {fileID: 0}
 --- !u!4 &679733017
 Transform:
   m_ObjectHideFlags: 0
