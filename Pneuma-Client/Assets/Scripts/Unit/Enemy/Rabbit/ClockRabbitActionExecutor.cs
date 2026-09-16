@@ -12,6 +12,15 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
     [SerializeField, Min(0f)]
     private float actionDelay = 0.5f;
 
+    [SerializeField, Min(0)]
+    private int baseAttackDamage = 3;
+
+
+    // 런타임 공격력 보너스
+    private int attackPowerBonus;
+
+    public int AttackPowerBonus => attackPowerBonus;
+
     private void Awake()
     {
         if (animationController == null)
@@ -44,35 +53,124 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
             yield break;
         }
 
-        animationController?.PlayAttack();
+        // 도주는 별도 처리
+        if (actionData.ActionType == EnemyActionType.Unique)
+        {
+            yield return ExecuteEscape(source);
+            yield break;
+        }
+
+        PlayActionAnimation(actionData);
 
         if (actionDelay > 0f)
         {
             yield return new WaitForSeconds(actionDelay);
         }
 
+        ApplyActionEffect(
+            source,
+            target,
+            actionData);
+
         Debug.Log(
             $"[ClockRabbitActionExecutor] " +
             $"{source.EnemyName} 행동 실행: " +
             $"{actionData.ActionName}, " +
             $"SkillGroupId: {actionData.SkillGroupId}");
+    }
 
-        // TODO:
-        // SkillGroup 실행 시스템이 연결되면
-        // actionData.SkillGroupId를 전달하여 실제 효과를 실행한다.
-
-        // 도주(Unique) 처리: 보상 없는 승리로 취급하기 위해
-        // 즉시 사망 처리해서 BattleManager의 기존 승리 판정(전멸)을 그대로 태운다.
-        // 시계토끼는 Unique 타입 행동이 도주 하나뿐이라는 전제로 작성됨.
-        // 이후 상태이상/소환 등 다른 Unique 행동이 추가되면
-        // SkillGroupId 등으로 조건을 더 구체화해야 한다.
-        if (actionData.ActionType == EnemyActionType.Unique)
+    // 애니메이션 처리
+    private void PlayActionAnimation(
+    EnemyActionData actionData)
+    {
+        switch (actionData.ActionType)
         {
-            Debug.Log(
-                $"[ClockRabbitActionExecutor] {source.EnemyName} 도주 - " +
-                "보상 없는 승리 처리를 위해 즉시 사망 처리합니다.");
+            case EnemyActionType.Attack:
+                animationController?.PlayAttack();
+                break;
 
-            source.Kill();
+            case EnemyActionType.Buff:
+                // 공격력 강화는 별도 애니메이션 없음
+                break;
+
+            case EnemyActionType.Debuff:
+                animationController?.PlayAttack();
+                break;
+        }
+    }
+
+    // 실제 효과 처리
+    private void ApplyActionEffect(
+    Enemy source,
+    Player target,
+    EnemyActionData actionData)
+    {
+        switch (actionData.ActionType)
+        {
+            case EnemyActionType.Attack:
+                ExecuteAttack(source, target);
+                break;
+
+            case EnemyActionType.Buff:
+                ExecuteAttackBuff(source);
+                break;
+
+            case EnemyActionType.Debuff:
+                ExecuteVulnerable(source, target);
+                break;
+        }
+    }
+
+    private void ExecuteAttack(
+    Enemy source,
+    Player target)
+    {
+        int finalDamage =
+            baseAttackDamage + attackPowerBonus;
+
+        target.TakeDamage(finalDamage);
+
+        Debug.Log(
+            $"[ClockRabbitActionExecutor] {source.EnemyName} 공격: " +
+            $"{baseAttackDamage} + 강화 {attackPowerBonus} " +
+            $"= {finalDamage} 피해");
+    }
+
+    private void ExecuteAttackBuff(Enemy source)
+    {
+        attackPowerBonus++;
+
+        Debug.Log(
+            $"[ClockRabbitActionExecutor] {source.EnemyName} 공격력 강화 " +
+            $"+1 (현재 누적: +{attackPowerBonus})");
+    }
+
+    private void ExecuteVulnerable(
+    Enemy source,
+    Player target)
+    {
+        target.ApplyVulnerable();
+
+        Debug.Log(
+            $"[ClockRabbitActionExecutor] " +
+            $"{source.EnemyName}이 " +
+            $"{target.CharacterName}에게 취약 부여");
+    }
+
+    private IEnumerator ExecuteEscape(Enemy source)
+    {
+        Debug.Log(
+            $"[ClockRabbitActionExecutor] " +
+            $"{source.EnemyName} 도주 시작");
+
+        if (animationController != null)
+        {
+            yield return animationController.PlayRunAndExit();
+        }
+
+        if (!source.IsDead)
+        {
+            source.Escape();
         }
     }
 }

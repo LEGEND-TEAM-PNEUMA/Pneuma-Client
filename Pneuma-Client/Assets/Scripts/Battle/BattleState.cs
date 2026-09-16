@@ -8,6 +8,7 @@ namespace Battle
         Action,      // 플레이어가 행동을 선택한 후 실제 효과와 연출을 처리하는 상태
         EnemyTurn,  // 적 턴
         Victory,         // 승리
-        Defeat         // 패배
+        Defeat,         // 패배
+        Escape
     }
 }
