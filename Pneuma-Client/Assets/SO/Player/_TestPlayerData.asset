@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b0fffeff2ac7fe498dd6be9f8a69d4e, type: 3}
   m_Name: _TestPlayerData
   m_EditorClassIdentifier: 
+  characterId: 01
   characterName: Leila
   maxHp: 100
   maxEnergy: 3
-  characterSprite: {fileID: 0}
-  animatorController: {fileID: 0}
+  characterSprite: {fileID: -1445075377265991416, guid: 7e91c74559cd32247b8264b5d6e7aced, type: 3}
+  animatorController: {fileID: 9100000, guid: 07ebdba563c3afc479d1354d430afce6, type: 2}
