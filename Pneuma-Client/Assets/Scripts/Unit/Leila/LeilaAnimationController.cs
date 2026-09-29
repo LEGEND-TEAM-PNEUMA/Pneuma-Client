@@ -1,3 +1,5 @@
+using Battle;
+using Pneuma.Unit;
 using UnityEngine;
 
 public class LeilaAnimationController : MonoBehaviour
@@ -11,16 +13,60 @@ public class LeilaAnimationController : MonoBehaviour
 
     [Header("Animator")]
     [SerializeField] private Animator animator;
+    
+    [Header("Owner")]
+    [SerializeField] private Player player;
 
     [Header("Debug")]
     [SerializeField] private bool enableKeyboardTest = false;
 
     private bool isDefeated;
+    private BattleManager battleManager;
 
     private void Awake()
     {
         if (animator == null)
             animator = GetComponent<Animator>();
+        if (player == null)
+            player = GetComponent<Player>();
+    }
+
+    private void OnEnable()
+    {
+        if (player == null)
+            return;
+
+        player.OnDamaged += HandleDamaged;
+        player.OnDeath += HandleDeath;
+    }
+
+    private void OnDisable()
+    {
+        if (player == null)
+            return;
+
+        player.OnDamaged -= HandleDamaged;
+        player.OnDeath -= HandleDeath;
+    }
+
+    private void Start()
+    {
+        // Start는 모든 Awake 이후에 실행되므로 BattleManager.Instance가 준비되어 있다.
+        battleManager = BattleManager.Instance;
+
+        if (battleManager == null)
+        {
+            Debug.LogWarning("[LeilaAnimationController] BattleManager를 찾지 못해 Victory 모션을 연결하지 않습니다.");
+            return;
+        }
+
+        battleManager.OnBattleStateChanged += HandleBattleStateChanged;
+    }
+
+    private void OnDestroy()
+    {
+        if (battleManager != null)
+            battleManager.OnBattleStateChanged -= HandleBattleStateChanged;
     }
 
     private void Update()
@@ -28,32 +74,11 @@ public class LeilaAnimationController : MonoBehaviour
         if (!enableKeyboardTest)
             return;
 
-        // 버프
-        if (Input.GetKeyDown(KeyCode.B))
-            PlayAnimation("Buff");
-
-        // 공격
-        else if (Input.GetKeyDown(KeyCode.A))
-            PlayAnimation("Attack");
-
-        // 피격
-        else if (Input.GetKeyDown(KeyCode.H))
-            PlayAnimation("Hit");
-
-        // 패배
-        else if (Input.GetKeyDown(KeyCode.D))
-            PlayAnimation("Defeat");
-
-        // 승리
-        else if (Input.GetKeyDown(KeyCode.V))
-            PlayAnimation("Victory");
-    }
-
-    private void PlayAnimation(string triggerName)
-    {
-        animator.SetTrigger(triggerName);
-
-        Debug.Log($"[LeilaAnimationController] {triggerName}");
+        if (Input.GetKeyDown(KeyCode.B))      PlayBuff();
+        else if (Input.GetKeyDown(KeyCode.A)) PlayAttack();
+        else if (Input.GetKeyDown(KeyCode.H)) PlayHit();
+        else if (Input.GetKeyDown(KeyCode.D)) PlayDefeat();
+        else if (Input.GetKeyDown(KeyCode.V)) PlayVictory();
     }
 
     [ContextMenu("Test/Attack")]
@@ -92,5 +117,25 @@ public class LeilaAnimationController : MonoBehaviour
 
         animator.SetTrigger(triggerHash);
         Debug.Log($"[LeilaAnimationController] {label}");
+    }
+
+    private void HandleDamaged(CharacterBase damagedUnit)
+    {
+        // 이번 피해로 쓰러졌다면 Hit 대신 HandleDeath의 Defeat만 재생한다.
+        if (player.IsDead)
+            return;
+
+        PlayHit();
+    }
+
+    private void HandleDeath(CharacterBase deadUnit)
+    {
+        PlayDefeat();
+    }
+
+    private void HandleBattleStateChanged(BattleState state)
+    {
+        if (state == BattleState.Victory)
+            PlayVictory();
     }
 }
