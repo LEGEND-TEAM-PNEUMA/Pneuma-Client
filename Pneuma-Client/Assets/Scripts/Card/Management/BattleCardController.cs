@@ -4,6 +4,7 @@ using System.Text;
 using Pneuma.Unit;
 using TMPro;
 using UnityEngine;
+using Battle;
 
 namespace Pneuma.Card.Management
 {
@@ -68,6 +69,15 @@ namespace Pneuma.Card.Management
             Debug.Log($"[BattleCardController] 전투 덱 초기화 완료. 덱: {DrawPileCount}");
         }
 
+        /// <summary>
+        /// 카드를 사용할 수 있는 전투 상태인지 확인합니다. 전투가 끝났거나 적 턴이면 false입니다.
+        /// </summary>
+        private static bool IsPlayerTurn()
+        {
+            return BattleManager.Instance == null ||
+                BattleManager.Instance.CurrentState == BattleState.PlayerTurn;
+        }
+
         public void DrawCards()
         {
             DrawForPlayerTurn();
@@ -113,7 +123,7 @@ namespace Pneuma.Card.Management
         private void UseCard(CardView cardView)
         {
             // 이전 카드가 처리 중이면 입력을 무시한다.
-            if (isResolvingCard)
+            if (isResolvingCard || !IsPlayerTurn())
             {
                 return;
             }
@@ -258,7 +268,7 @@ namespace Pneuma.Card.Management
                     continue;
                 }
 
-                bool canUse = currentPlayer == null || currentPlayer.CanUseEnergy(cardView.BoundCard.CurrentCost);
+                bool canUse = IsPlayerTurn() && (currentPlayer == null || currentPlayer.CanUseEnergy(cardView.BoundCard.CurrentCost));
                 cardView.SetInteractable(canUse);
             }
         }

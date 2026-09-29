@@ -309,6 +309,9 @@ MonoBehaviour:
   cardParent: {fileID: 2138083196}
   targetEnemy: {fileID: 2093964391}
   playerAnimation: {fileID: 627383970}
+  attackHitDelay: 0.5
+  buffEffectDelay: 0.6
+  recoveryDelay: 0.5
   deckStateText: {fileID: 303831078}
   handStateText: {fileID: 1925301903}
   discardStateText: {fileID: 2073419692}
@@ -920,6 +923,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 807662666680104373, guid: eaef93dfb0c4b3349bf07e9c334f86af, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 627383969}
     - target: {fileID: 4713899273606798260, guid: eaef93dfb0c4b3349bf07e9c334f86af, type: 3}
       propertyPath: m_LocalPosition.x
       value: -7.22
