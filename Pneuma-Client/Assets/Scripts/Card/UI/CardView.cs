@@ -67,10 +67,10 @@ public class CardView : MonoBehaviour
         }
 
         CardData data = BoundCard.Data;
-        // TODO: 한글 TMP 폰트 에셋 추가 후 카드 텍스트 표시를 활성화합니다.
-        // SetText(cardNameText, data.CardName);
-        // SetText(costText, BoundCard.CurrentCost.ToString());
-        // SetText(descriptionText, data.CardDescription);
+        SetText(cardNameText, data.CardName);
+        SetText(costText, BoundCard.CurrentCost.ToString());
+        SetText(descriptionText, data.CardDescription);
+        SetImage(data.CardIllust);
         SetImage(data.CardIllust);
     }
 

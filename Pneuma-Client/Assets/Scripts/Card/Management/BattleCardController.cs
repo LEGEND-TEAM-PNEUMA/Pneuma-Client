@@ -1,8 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Pneuma.Unit;
 using TMPro;
 using UnityEngine;
+using Battle;
 
 namespace Pneuma.Card.Management
 {
@@ -20,6 +22,21 @@ namespace Pneuma.Card.Management
         [SerializeField] private Transform cardParent;
         [SerializeField] private Enemy targetEnemy;
 
+        [Header("Character Motion")]
+        [SerializeField] private LeilaAnimationController playerAnimation;
+
+        [Header("Card Resolve Timing")]
+        [Tooltip("공격 모션 시작 후 피해가 들어가기까지의 시간(초)")]
+        [SerializeField, Min(0f)] private float attackHitDelay = 0.5f;
+
+        [Tooltip("버프 모션 시작 후 효과가 적용되기까지의 시간(초)")]
+        [SerializeField, Min(0f)] private float buffEffectDelay = 0.6f;
+
+        [Tooltip("효과 적용 후 다음 카드를 쓸 수 있을 때까지의 시간(초)")]
+        [SerializeField, Min(0f)] private float recoveryDelay = 0.5f;
+
+        private bool isResolvingCard;
+
         [Header("State View")]
         [SerializeField] private TMP_Text deckStateText;
         [SerializeField] private TMP_Text handStateText;
@@ -35,6 +52,7 @@ namespace Pneuma.Card.Management
         public int DrawPileCount => cardCycleManager.DrawPileCount;
         public int HandCount => cardCycleManager.HandCount;
         public int DiscardPileCount => cardCycleManager.DiscardPileCount;
+        public bool IsResolvingCard => isResolvingCard;
 
         public void InitializeDeck()
         {
@@ -49,6 +67,15 @@ namespace Pneuma.Card.Management
             RefreshCardInteractables();
 
             Debug.Log($"[BattleCardController] 전투 덱 초기화 완료. 덱: {DrawPileCount}");
+        }
+
+        /// <summary>
+        /// 카드를 사용할 수 있는 전투 상태인지 확인합니다. 전투가 끝났거나 적 턴이면 false입니다.
+        /// </summary>
+        private static bool IsPlayerTurn()
+        {
+            return BattleManager.Instance == null ||
+                BattleManager.Instance.CurrentState == BattleState.PlayerTurn;
         }
 
         public void DrawCards()
@@ -95,6 +122,12 @@ namespace Pneuma.Card.Management
 
         private void UseCard(CardView cardView)
         {
+            // 이전 카드가 처리 중이면 입력을 무시한다.
+            if (isResolvingCard || !IsPlayerTurn())
+            {
+                return;
+            }
+
             if (cardView == null || cardView.BoundCard == null)
             {
                 return;
@@ -115,17 +148,83 @@ namespace Pneuma.Card.Management
                 return;
             }
 
-            executor.Execute(card, targetEnemy);
-
+            // 카드 데이터는 이미 버린 더미로 이동했으므로 화면에서도 바로 치운다.
             cardView.Clicked -= UseCard;
             displayedViews.Remove(cardView);
             Destroy(cardView.gameObject);
             RefreshStateView();
+
+            StartCoroutine(ResolveCardRoutine(card));
+        }
+
+        /// <summary>
+        /// 카드 한 장의 연출과 효과를 순서대로 처리합니다.
+        /// 모션 → 타격 시점 대기 → 효과 적용 → 마무리 대기 → 입력 잠금 해제
+        /// </summary>
+        private IEnumerator ResolveCardRoutine(CardInstance card)
+        {
+            isResolvingCard = true;
+            SetAllCardsInteractable(false);
+
+            float effectDelay = PlayCardMotion(card);
+
+            if (effectDelay > 0f)
+            {
+                yield return new WaitForSeconds(effectDelay);
+            }
+
+            executor.Execute(card, targetEnemy);
+
+            if (recoveryDelay > 0f)
+            {
+                yield return new WaitForSeconds(recoveryDelay);
+            }
+
+            isResolvingCard = false;
             RefreshCardInteractables();
 
             Debug.Log(
-                $"[BattleCardController] 카드 사용: {card.CardName}. " +
+                $"[BattleCardController] 카드 처리 완료: {card.CardName}. " +
                 $"덱: {DrawPileCount}, 손패: {HandCount}, 버린 더미: {DiscardPileCount}");
+        }
+
+        private void SetAllCardsInteractable(bool value)
+        {
+            for (int i = 0; i < displayedViews.Count; i++)
+            {
+                if (displayedViews[i] != null)
+                {
+                    displayedViews[i].SetInteractable(value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 카드 타입에 맞는 플레이어 모션을 재생하고, 효과 적용까지 기다릴 시간을 반환합니다.
+        /// </summary>
+        private float PlayCardMotion(CardInstance card)
+        {
+            if (card?.Data == null)
+            {
+                return 0f;
+            }
+
+            if (playerAnimation == null)
+            {
+                Debug.LogWarning("[BattleCardController] Player 애니메이션이 연결되지 않았습니다.");
+                return 0f;
+            }
+
+            switch (card.Data.CardType)
+            {
+                case CardType.Attack:
+                    playerAnimation.PlayAttack();
+                    return attackHitDelay;
+
+                default:
+                    playerAnimation.PlayBuff();
+                    return buffEffectDelay;
+            }
         }
 
         private CardView CreateCardView()
@@ -169,7 +268,7 @@ namespace Pneuma.Card.Management
                     continue;
                 }
 
-                bool canUse = currentPlayer == null || currentPlayer.CanUseEnergy(cardView.BoundCard.CurrentCost);
+                bool canUse = IsPlayerTurn() && (currentPlayer == null || currentPlayer.CanUseEnergy(cardView.BoundCard.CurrentCost));
                 cardView.SetInteractable(canUse);
             }
         }

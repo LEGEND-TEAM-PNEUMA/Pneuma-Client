@@ -247,6 +247,12 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
+        if (battleCardController != null && battleCardController.IsResolvingCard)
+        {
+            Debug.LogWarning("[BattleManager] 카드 효과 처리 중에는 턴을 종료할 수 없습니다.");
+            return;
+        }
+
         if (battleCardController != null)
         {
             battleCardController.DiscardHand();
