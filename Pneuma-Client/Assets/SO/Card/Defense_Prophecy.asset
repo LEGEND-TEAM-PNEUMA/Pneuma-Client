@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014281e33f2f4a1f8d98a4de38863341, type: 3}
   m_Name: Defense_Prophecy
   m_EditorClassIdentifier: 
-  cardName: "수비(예언)"
+  cardName: "\uC218\uBE44(\uC608\uC5B8)"
   cardType: 5
   cardRarity: 0
   cardCharacter: CHAR_LLA_(cid:22521)(cid:22521)(cid:22522)
@@ -33,8 +33,9 @@ MonoBehaviour:
   cardIsProphecy: 0
   cardIsUpgraded: 0
   cardUpgradeTarget: {fileID: 11400000, guid: 14b1f1877de84accf42d2e683c6a98ef, type: 2}
-  cardUpgradedFrom: {fileID: 0}
+  cardUpgradedFrom: {fileID: 11400000}
   cardHasCutscene: 0
   cardCutsceneSound: {fileID: 0}
   cardIllust: {fileID: 0}
-  cardDescription: "자신에게 방어도를 4부여한다. 예언 : 자신에게 방어도를 6부여한다."
+  cardDescription: "\uC790\uC2E0\uC5D0\uAC8C \uBC29\uC5B4\uB3C4\uB97C 4\uBD80\uC5EC\uD55C\uB2E4.
+    \uC608\uC5B8 : \uC790\uC2E0\uC5D0\uAC8C \uBC29\uC5B4\uB3C4\uB97C 6\uBD80\uC5EC\uD55C\uB2E4."

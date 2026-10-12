@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -16,6 +17,10 @@ namespace Pneuma.UI.Card
         [SerializeField] private float tiltAmount = 0.15f;   // 뒤처진 간격 → 각도 비율
         [SerializeField] private float maxTilt = 25f;        // 최대 기울기 각도
         [SerializeField] private float tiltSmoothTime = 0.1f; // 각도 보간 시간(클수록 부드럽게)
+
+        [Header("Use (드롭 사용 판정)")]
+        [Tooltip("제자리보다 이 거리(캔버스 단위) 이상 위로 끌어올려 놓으면 사용 요청으로 판정합니다.")]
+        [SerializeField] private float useDragHeight = 250f;
 
         private RectTransform rectTransform;
         private Canvas canvas;
@@ -41,6 +46,12 @@ namespace Pneuma.UI.Card
         /// 호버 쪽에서 이 값을 보고 상태를 유지할지 판단합니다.
         /// </summary>
         public bool IsDragging => isDragging;
+
+        /// <summary>
+        /// 카드를 사용 영역(제자리보다 useDragHeight 이상 위)에 놓았을 때 발행됩니다.
+        /// 실제 사용 여부는 구독자가 판단하며, 거절되면 카드는 Update에서 제자리로 돌아갑니다.
+        /// </summary>
+        public event Action DroppedInUseZone;
 
         private void Awake()
         {
@@ -84,9 +95,27 @@ namespace Pneuma.UI.Card
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            // TODO(#27): 드롭 위치에 따라 카드 사용/취소 판정.
-            // 지금은 드래그만 풀면 Update가 알아서 제자리(home)로 되돌린다.
+            if (!isDragging) return;
+
             isDragging = false;
+
+            // 판정은 카드의 실제 위치가 아니라 커서가 끌고 간 목표(dragTarget)로 한다.
+            // 카드는 커서를 늦게 따라오므로, 실제 위치로 판정하면 빠르게 던질 때 결과가 들쭉날쭉해진다.
+            float raisedHeight = dragTarget.y - homePosition.y;
+
+            if (Interactable && raisedHeight >= useDragHeight)
+                DroppedInUseZone?.Invoke();
+        }
+
+        /// <summary>
+        /// 현재 위치를 제자리로 고정합니다.
+        /// 사용·퇴장 연출 중 카드가 손패 자리로 끌려 돌아가지 않게 할 때 씁니다.
+        /// </summary>
+        public void HoldCurrentPosition()
+        {
+            isDragging = false;
+            homePosition = rectTransform.anchoredPosition;
+            homeRotation = rectTransform.localEulerAngles.z;
         }
 
         private void Update()

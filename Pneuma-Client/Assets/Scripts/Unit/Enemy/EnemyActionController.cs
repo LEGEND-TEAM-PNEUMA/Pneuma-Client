@@ -14,6 +14,9 @@ public class EnemyActionController : MonoBehaviour
 
     public EnemyActionRuntime PredictedAction { get; private set; }
 
+    // 예견 UI가 예상 피해량을 묻기 위해 노출한다.
+    public EnemyActionExecutor ActionExecutor => actionExecutor;
+
     public event Action<EnemyActionData> OnActionPredicted;
 
     public void Initialize(Enemy enemy, EnemyBehaviorData behaviorData)

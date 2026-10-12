@@ -11,7 +11,7 @@ namespace Pneuma.Card.Management
     /// <summary>
     /// 실제 전투 흐름에서 카드 순환 상태와 손패 UI 생성을 관리합니다.
     /// </summary>
-    public class BattleCardController : MonoBehaviour
+    public class BattleCardController : BattleCardSystem
     {
         [Header("Deck")]
         [SerializeField] private List<CardData> startingDeck = new List<CardData>();
@@ -52,14 +52,14 @@ namespace Pneuma.Card.Management
         public int DrawPileCount => cardCycleManager.DrawPileCount;
         public int HandCount => cardCycleManager.HandCount;
         public int DiscardPileCount => cardCycleManager.DiscardPileCount;
-        public bool IsResolvingCard => isResolvingCard;
+        public override bool IsResolvingCard => isResolvingCard;
 
         public void InitializeDeck()
         {
             InitializeBattleDeck();
         }
 
-        public void InitializeBattleDeck()
+        public override void InitializeBattleDeck()
         {
             ClearDisplayedViews();
             cardCycleManager.InitializeDeck(startingDeck);
@@ -83,7 +83,7 @@ namespace Pneuma.Card.Management
             DrawForPlayerTurn();
         }
 
-        public void DrawForPlayerTurn()
+        public override void DrawForPlayerTurn()
         {
             IReadOnlyList<CardInstance> drawnCards = cardCycleManager.DrawCards(drawCountPerTurn);
 
@@ -109,7 +109,7 @@ namespace Pneuma.Card.Management
                 $"드로우: {drawnCards.Count}, 덱: {DrawPileCount}, 손패: {HandCount}, 버린 더미: {DiscardPileCount}");
         }
 
-        public void DiscardHand()
+        public override void DiscardHand()
         {
             int discardedCount = cardCycleManager.DiscardHand();
             ClearDisplayedViews();

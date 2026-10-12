@@ -18,6 +18,22 @@ namespace Pneuma.UI.Card
         private UICardAnimator cardAnimator;
         private UICardDrag cardDrag;
 
+        /// <summary>
+        /// 이 카드가 사용 영역에 드롭되었을 때 발행됩니다. CardHandView가 구독합니다.
+        /// </summary>
+        public event Action<UICardData> UseRequested;
+
+        /// <summary>
+        /// 마우스가 카드에 올라가거나(true) 벗어날 때(false) 발행됩니다.
+        /// CardHandView가 받아 손패 정렬에 전달하고, 정렬은 이웃 카드를 옆으로 벌립니다.
+        /// </summary>
+        public event Action<UICardData, bool> HoverChanged;
+
+        /// <summary>
+        /// 사용 가능 여부(코스트 부족 반투명 등)를 표시하는 컴포넌트입니다.
+        /// </summary>
+        public UICardInteraction Interaction { get; private set; }
+
         // 정렬(CardHandLayout)이 제자리를 지정할 대상입니다.
         public UICardDrag CardDrag => cardDrag;
 
@@ -41,7 +57,22 @@ namespace Pneuma.UI.Card
 
             // 표기·연출과 달리 위치는 카드 루트가 담당하므로 자식에서 찾지 않는다.
             cardDrag = GetComponent<UICardDrag>();
+            Interaction = GetComponent<UICardInteraction>();
+
+            if (cardDrag != null) cardDrag.DroppedInUseZone += HandleDroppedInUseZone;
         }
+
+        private void OnDestroy()
+        {
+            if (cardDrag != null) cardDrag.DroppedInUseZone -= HandleDroppedInUseZone;
+        }
+
+        private void HandleDroppedInUseZone() => UseRequested?.Invoke(this);
+
+        /// <summary>
+        /// 호버 상태가 바뀌었음을 알립니다. UICardInteraction이 호출합니다.
+        /// </summary>
+        public void NotifyHoverChanged(bool isHovered) => HoverChanged?.Invoke(this, isHovered);
 
         /// <summary>
         /// CardHandView가 스폰 직후 호출해 런타임 카드를 주입합니다.
@@ -88,10 +119,17 @@ namespace Pneuma.UI.Card
         /// 연출을 붙이지 못한 카드는 곧바로 콜백을 호출해 호출자가 멈추지 않게 합니다.
         /// </summary>
         /// <param name="onComplete">연출이 끝난 뒤 실행할 동작</param>
-        public void PlayDisappear(Action onComplete)
+        /// <param name="isUsed">사용으로 빠지는 카드면 true. 그 자리에서 커졌다가 사라집니다.</param>
+        public void PlayDisappear(Action onComplete, bool isUsed = false)
         {
             // 사라지는 중인 카드를 다시 집으면 드래그가 위치를 도로 가져가 연출이 어긋난다.
-            if (cardDrag != null) cardDrag.Interactable = false;
+            if (cardDrag != null)
+            {
+                cardDrag.Interactable = false;
+
+                // 놓은 자리에서 연출하도록 고정한다. 고정하지 않으면 손패 자리로 미끄러지며 사라진다.
+                cardDrag.HoldCurrentPosition();
+            }
 
             if (cardAnimator == null)
             {
@@ -99,7 +137,10 @@ namespace Pneuma.UI.Card
                 return;
             }
 
-            cardAnimator.PlayDisappear(onComplete);
+            if (isUsed)
+                cardAnimator.PlayUse(onComplete);
+            else
+                cardAnimator.PlayDisappear(onComplete);
         }
     }
 

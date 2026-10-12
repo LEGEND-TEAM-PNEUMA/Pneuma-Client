@@ -23,6 +23,9 @@ namespace Pneuma.Unit
 
         public EnemyData EnemyData => enemyData;
 
+        // 예견 UI가 행동 예견 이벤트를 구독하기 위해 노출한다.
+        public EnemyActionController ActionController => actionController;
+
         public string EnemyId => enemyData != null ? enemyData.EnemyId : string.Empty;
         public string EnemyName => enemyData != null ? enemyData.EnemyName : string.Empty;
 
