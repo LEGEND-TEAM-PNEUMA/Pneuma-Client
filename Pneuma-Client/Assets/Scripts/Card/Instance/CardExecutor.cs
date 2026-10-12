@@ -9,8 +9,15 @@ public class CardExecutor
         if (card == null)
             return;
 
-        CardData data = card.Data;
+        Execute(card.Data, targetEnemy);
+    }
 
+    /// <summary>
+    /// 카드 데이터의 스킬을 순서대로 적용합니다.
+    /// 런타임 카드 타입(CardInstance / UI의 RuntimeCard)과 무관하게 쓸 수 있도록 데이터만 받습니다.
+    /// </summary>
+    public void Execute(CardData data, Enemy targetEnemy)
+    {
         if (data == null || data.CardSkills == null)
             return;
 

@@ -22,6 +22,13 @@ namespace Pneuma.UI.Card
         // 부채꼴 전체를 평행 이동시킵니다.
         [SerializeField] private Vector2 offset = Vector2.zero;
 
+        [Header("호버 시 이웃 카드 벌어짐")]
+        [Tooltip("호버된 카드 바로 옆 카드가 바깥쪽으로 밀려나는 거리(캔버스 단위)")]
+        [SerializeField] private float hoverSpread = 60f;
+
+        [Tooltip("한 칸 멀어질 때마다 밀려나는 거리에 곱하는 비율. 1이면 모두 같은 거리, 작을수록 먼 카드는 덜 움직입니다.")]
+        [SerializeField, Range(0f, 1f)] private float hoverSpreadFalloff = 0.6f;
+
         [Header("기즈모")]
         [SerializeField] private bool drawGizmos = true;
 
@@ -37,6 +44,33 @@ namespace Pneuma.UI.Card
         // 마지막으로 정렬한 손패. CardHandView의 리스트를 그대로 참조하므로 항상 최신 상태다.
         // 인스펙터에서 값을 바꿨을 때 다시 배치하기 위해 들고 있는다.
         private IReadOnlyList<UICardData> currentCards;
+
+        // 지금 마우스가 올라가 있는 카드. 없으면 null.
+        private UICardData hoveredCard;
+
+        /// <summary>
+        /// 마우스가 올라간 카드를 지정하고 이웃 카드를 옆으로 벌립니다.
+        /// 실제 이동은 각 카드의 UICardDrag가 제자리(home)를 부드럽게 따라가며 처리합니다.
+        /// </summary>
+        public void SetHoveredCard(UICardData card)
+        {
+            if (hoveredCard == card) return;
+
+            hoveredCard = card;
+            ApplyLayout();
+        }
+
+        /// <summary>
+        /// 지정한 카드가 지금 호버된 카드일 때만 호버를 풀고 원래 간격으로 되돌립니다.
+        /// 다른 카드로 바로 옮겨 간 경우(새 카드의 Set이 먼저 온 경우) 그 상태를 지우지 않기 위함입니다.
+        /// </summary>
+        public void ClearHoveredCard(UICardData card)
+        {
+            if (hoveredCard != card) return;
+
+            hoveredCard = null;
+            ApplyLayout();
+        }
 
         /// <summary>
         /// 손패 순서대로 부채꼴 위치를 계산해 각 카드에 지정합니다.
@@ -69,6 +103,17 @@ namespace Pneuma.UI.Card
             // 중앙 인덱스. 짝수 장이면 두 카드 사이(x.5)가 중앙이 된다.
             float mid = (cardCount - 1) / 2f;
 
+            // 호버된 카드의 손패 순서. 없으면 -1이라 아무 카드도 밀리지 않는다.
+            int hoveredIndex = -1;
+            for (int i = 0; i < cardCount; i++)
+            {
+                if (cards[i] == hoveredCard)
+                {
+                    hoveredIndex = i;
+                    break;
+                }
+            }
+
             for (int i = 0; i < cardCount; i++)
             {
                 UICardData card = cards[i];
@@ -83,8 +128,26 @@ namespace Pneuma.UI.Card
                 if (card.CardDrag == null) continue;
 
                 GetSlot(i - mid, out Vector2 position, out float rotation);
+                position.x += GetHoverSpread(i, hoveredIndex);
                 card.CardDrag.SetHome(position, rotation);
             }
+
+            // 위 루프가 렌더 순서를 손패 순서로 되돌렸으므로, 호버된 카드를 다시 맨 앞으로 올린다.
+            if (hoveredIndex >= 0) cards[hoveredIndex].transform.SetAsLastSibling();
+        }
+
+        /// <summary>
+        /// 호버된 카드 기준으로 i번째 카드가 밀려날 가로 거리를 구합니다.
+        /// 왼쪽 카드는 왼쪽(-), 오른쪽 카드는 오른쪽(+)으로, 멀수록 falloff만큼 줄어듭니다.
+        /// </summary>
+        private float GetHoverSpread(int index, int hoveredIndex)
+        {
+            if (hoveredIndex < 0 || index == hoveredIndex) return 0f;
+
+            int distance = Mathf.Abs(index - hoveredIndex);
+            float amount = hoverSpread * Mathf.Pow(hoverSpreadFalloff, distance - 1);
+
+            return index < hoveredIndex ? -amount : amount;
         }
 
         /// <summary>

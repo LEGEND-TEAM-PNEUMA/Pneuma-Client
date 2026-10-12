@@ -11,7 +11,7 @@ namespace Pneuma.UI.Card
     // 여기서는 "언제" 연출할지와 테두리·반투명 같은 상태 표시만 결정합니다.
     // 카드 사용은 클릭 선택이 아닌 드래그 앤 드롭이므로(3.3.2 [2]) 선택 상태는 두지 않습니다.
     [RequireComponent(typeof(UICardData))]
-    public class UICardInteraction : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IEndDragHandler
+    public class UICardInteraction : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler, IEndDragHandler
     {
         [Header("연결")]
         // 카드보다 조금 크게 깔려, 가장자리만 테두리처럼 드러나는 이미지.
@@ -84,6 +84,9 @@ namespace Pneuma.UI.Card
             // 등장 중에는 두 연출이 같은 값을 두고 다퉈 카드가 튀므로 호버를 받지 않는다.
             if (animator != null && animator.IsAppearing) return;
 
+            // 사용·퇴장 중인 카드는 다시 호버되지 않는다.
+            if (animator != null && animator.IsLeaving) return;
+
             isHovered = true;
 
             // 인접 카드에 가리지 않도록 맨 앞으로 올린다.
@@ -95,6 +98,9 @@ namespace Pneuma.UI.Card
             if (borderImage != null) borderImage.gameObject.SetActive(true);
 
             if (animator != null) animator.PlayHover();
+
+            // 손패 정렬이 이웃 카드를 옆으로 벌릴 수 있도록 알린다.
+            cardData.NotifyHoverChanged(true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
@@ -112,11 +118,21 @@ namespace Pneuma.UI.Card
             Unhover();
         }
 
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            // 호버로 화면 아래에 맞춰 올라간 상태 그대로 끌면 카드가 커서에서 멀리 떨어진다.
+            // 확대는 유지하고 위치만 제자리로 돌린다.
+            if (!isHovered || cardData.CardDrag == null || !cardData.CardDrag.Interactable) return;
+
+            UICardAnimator animator = cardData.CardAnimator;
+            if (animator != null) animator.PlayDragHold();
+        }
+
         public void OnEndDrag(PointerEventData eventData)
         {
-            // 드래그를 놓은 시점에 커서가 카드 밖에 있었다면 그제서야 호버를 푼다.
-            if (!unhoverOnDragEnd) return;
-
+            // 드래그가 끝나면 호버를 푼다.
+            // 카드는 놓은 자리에서 손패 자리로 미끄러져 돌아가므로, 그 자리 기준으로 계산한 호버 위치는 맞지 않는다.
+            // 다시 마우스를 올리면 돌아간 자리 기준으로 새로 올라온다.
             unhoverOnDragEnd = false;
             Unhover();
         }
@@ -136,6 +152,8 @@ namespace Pneuma.UI.Card
 
             UICardAnimator animator = cardData.CardAnimator;
             if (animator != null) animator.PlayUnhover();
+
+            cardData.NotifyHoverChanged(false);
         }
 
         private void ApplyBorderColor()

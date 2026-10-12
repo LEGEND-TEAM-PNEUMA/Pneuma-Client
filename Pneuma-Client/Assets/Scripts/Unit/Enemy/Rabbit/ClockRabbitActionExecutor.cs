@@ -21,6 +21,14 @@ public sealed class ClockRabbitActionExecutor : EnemyActionExecutor
 
     public int AttackPowerBonus => attackPowerBonus;
 
+    public override int GetExpectedDamage(EnemyActionData actionData)
+    {
+        if (actionData == null || actionData.ActionType != EnemyActionType.Attack)
+            return 0;
+
+        return baseAttackDamage + attackPowerBonus;
+    }
+
     private void Awake()
     {
         if (animationController == null)

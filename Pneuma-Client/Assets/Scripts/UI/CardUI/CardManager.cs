@@ -86,6 +86,32 @@ namespace Pneuma.UI.Card
         }
 
         /// <summary>
+        /// 씬 단독 실행용 자동 시작을 끕니다.
+        /// 배틀 흐름(UIBattleCardController)이 Awake에서 호출하므로, 모든 Start보다 먼저 적용됩니다.
+        /// </summary>
+        public void DisableAutoStart() => autoStartOnPlay = false;
+
+        /// <summary>
+        /// 턴 시작 드로우만 수행합니다. 손패 버리기는 턴 종료 시 BattleManager가 따로 요청합니다.
+        /// </summary>
+        public void DrawTurnHand() => DrawCards(handDrawCount);
+
+        /// <summary>
+        /// 손패의 카드를 사용 처리합니다. 소멸 카드는 소멸 더미로, 나머지는 버림 더미로 보냅니다.
+        /// </summary>
+        /// <param name="card">사용할 카드</param>
+        /// <returns>손패에 있어 실제로 이동했으면 true</returns>
+        public bool UseCard(RuntimeCard card)
+        {
+            if (card == null) return false;
+
+            CardListType destination =
+                card.Data != null && card.Data.CardExhausts ? CardListType.EXHAUST : CardListType.DISCARD;
+
+            return MoveCard(CardListType.HAND, destination, card);
+        }
+
+        /// <summary>
         /// 시작 덱의 CardData를 런타임 카드로 만들어 뽑을 더미에 채우고 셔플합니다.
         /// 모든 더미를 비우므로 전투 시작 시 한 번만 호출합니다.
         /// </summary>
@@ -214,13 +240,14 @@ namespace Pneuma.UI.Card
         /// <param name="from">시작 리스트</param>
         /// <param name="to">목적지 리스트</param>
         /// <param name="card">카드 요소</param>
-        private void MoveCard(CardListType from, CardListType to, RuntimeCard card)
+        private bool MoveCard(CardListType from, CardListType to, RuntimeCard card)
         {
-            if (card == null) return;
-            if (!cardListDictionary[from].Remove(card)) return;
+            if (card == null) return false;
+            if (!cardListDictionary[from].Remove(card)) return false;
             cardListDictionary[to].Add(card);
 
             OnCardMoved?.Invoke(card, from, to);
+            return true;
         }
     }
 

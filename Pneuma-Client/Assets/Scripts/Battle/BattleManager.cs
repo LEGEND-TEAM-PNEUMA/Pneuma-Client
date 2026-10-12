@@ -15,7 +15,11 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private List<Enemy> enemies = new(); // enemy 리스트 연결
 
     [Header("Card")]
-    [SerializeField] private BattleCardController battleCardController;
+    [SerializeField] private BattleCardSystem battleCardController; // 버튼형/드래그형 카드 시스템 모두 연결 가능
+
+    [Header("Turn Timing")]
+    [Tooltip("적 행동이 모두 끝난 뒤 플레이어 턴으로 넘어가기 전까지 기다리는 시간(초)")]
+    [SerializeField, Min(0f)] private float enemyTurnEndDelay = 1f;
 
     public Player CurrentPlayer => currentPlayer;
     public IReadOnlyList<Enemy> Enemies => enemies;
@@ -417,6 +421,14 @@ public class BattleManager : MonoBehaviour
         // 다음 PlayerTurn에서 보여줄 적 행동을 먼저 결정한다.
         int nextTurn = CurrentTurn + 1;
         PredictEnemyActions(nextTurn);
+
+        // 적 행동이 끝나자마자 넘어가면 피격·예견 변화를 볼 틈이 없으므로 잠시 기다린다.
+        if (enemyTurnEndDelay > 0f)
+            yield return new WaitForSeconds(enemyTurnEndDelay);
+
+        // 기다리는 동안 전투가 끝났다면(디버그 킬 등) PlayerTurn으로 복귀하지 않는다.
+        if (CurrentState != BattleState.EnemyTurn)
+            yield break;
 
         ChangeState(BattleState.PlayerTurn);
     }
